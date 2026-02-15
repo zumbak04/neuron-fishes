@@ -1,0 +1,663 @@
+fileFormatVersion: 2
+guid: 2cc5254c8d29bb04f9937d24f1b33d86
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5361677569064129006
+    second: ParallaxLights_0
+  - first:
+      213: -1191564509602122434
+    second: ParallaxLights_1
+  - first:
+      213: 3319461160548138564
+    second: ParallaxLights_2
+  - first:
+      213: -3644864966359937384
+    second: ParallaxLights_3
+  - first:
+      213: -7195082098129280113
+    second: ParallaxLights_4
+  - first:
+      213: 5320863223731697815
+    second: ParallaxLights_5
+  - first:
+      213: 290079314426515472
+    second: ParallaxLights_6
+  - first:
+      213: 191672478607585518
+    second: ParallaxLights_7
+  - first:
+      213: -4417160769643192140
+    second: ParallaxLights_8
+  - first:
+      213: -6325203528691186902
+    second: ParallaxLights_9
+  - first:
+      213: 8046488846260926047
+    second: ParallaxLights_10
+  - first:
+      213: 5928756942788724518
+    second: ParallaxLights_11
+  - first:
+      213: 4346213256193079706
+    second: ParallaxLights_12
+  - first:
+      213: -4960151686713825429
+    second: ParallaxLights_13
+  - first:
+      213: -5368563622550934594
+    second: ParallaxLights_14
+  - first:
+      213: -1169862433840960257
+    second: ParallaxLights_15
+  - first:
+      213: -122129178514443061
+    second: ParallaxLights_16
+  - first:
+      213: 3802423958359467661
+    second: ParallaxLights_17
+  - first:
+      213: 1664733466005198563
+    second: ParallaxLights_18
+  - first:
+      213: 3849781896422216856
+    second: ParallaxLights_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 4
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ParallaxLights_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 339
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee15f387751886a40800000000000000
+      internalID: 5361677569064129006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_1
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 312
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e35f3364466b67fe0800000000000000
+      internalID: -1191564509602122434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_2
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 219
+        width: 28
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44e7d289658111e20800000000000000
+      internalID: 3319461160548138564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_3
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 93
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89e89d9df96da6dc0800000000000000
+      internalID: -3644864966359937384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_4
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 372
+        width: 25
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f836b33f3fee52c90800000000000000
+      internalID: -7195082098129280113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_5
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 418
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 798b7fc29e087d940800000000000000
+      internalID: 5320863223731697815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_6
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 145
+        width: 20
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 010d41d7991960400800000000000000
+      internalID: 290079314426515472
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_7
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 30
+        width: 24
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee0bf909a15f8a200800000000000000
+      internalID: 191672478607585518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_8
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 50
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b060a1eea713b2c0800000000000000
+      internalID: -4417160769643192140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_9
+      rect:
+        serializedVersion: 2
+        x: 241
+        y: 140
+        width: 51
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a23805c27ec5838a0800000000000000
+      internalID: -6325203528691186902
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_10
+      rect:
+        serializedVersion: 2
+        x: 281
+        y: 328
+        width: 136
+        height: 184
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f56768a39fedaaf60800000000000000
+      internalID: 8046488846260926047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_11
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 73
+        width: 79
+        height: 252
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6278d8e070d274250800000000000000
+      internalID: 5928756942788724518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_12
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 84
+        width: 23
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a997b75ede9d05c30800000000000000
+      internalID: 4346213256193079706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_13
+      rect:
+        serializedVersion: 2
+        x: 359
+        y: 49
+        width: 33
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b672e5922500a2bb0800000000000000
+      internalID: -4960151686713825429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_14
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 0
+        width: 147
+        height: 506
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebb64c344d70f75b0800000000000000
+      internalID: -5368563622550934594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_15
+      rect:
+        serializedVersion: 2
+        x: 377
+        y: 176
+        width: 27
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ffce5da8050d3cfe0800000000000000
+      internalID: -1169862433840960257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_16
+      rect:
+        serializedVersion: 2
+        x: 385
+        y: 318
+        width: 25
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc4bfe1c82c1e4ef0800000000000000
+      internalID: -122129178514443061
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_17
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 148
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d86637ba17ce4c430800000000000000
+      internalID: 3802423958359467661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_18
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 46
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e6d1f664425a1710800000000000000
+      internalID: 1664733466005198563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ParallaxLights_19
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 86
+        width: 23
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 894d9fedc3c2d6530800000000000000
+      internalID: 3849781896422216856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ParallaxLights_0: 5361677569064129006
+      ParallaxLights_1: -1191564509602122434
+      ParallaxLights_10: 8046488846260926047
+      ParallaxLights_11: 5928756942788724518
+      ParallaxLights_12: 4346213256193079706
+      ParallaxLights_13: -4960151686713825429
+      ParallaxLights_14: -5368563622550934594
+      ParallaxLights_15: -1169862433840960257
+      ParallaxLights_16: -122129178514443061
+      ParallaxLights_17: 3802423958359467661
+      ParallaxLights_18: 1664733466005198563
+      ParallaxLights_19: 3849781896422216856
+      ParallaxLights_2: 3319461160548138564
+      ParallaxLights_3: -3644864966359937384
+      ParallaxLights_4: -7195082098129280113
+      ParallaxLights_5: 5320863223731697815
+      ParallaxLights_6: 290079314426515472
+      ParallaxLights_7: 191672478607585518
+      ParallaxLights_8: -4417160769643192140
+      ParallaxLights_9: -6325203528691186902
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
