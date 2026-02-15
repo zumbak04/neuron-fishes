@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Diet
 {
+    // todo zumbak
     public class BitingAuthoring : MonoBehaviour
     {
         private class Baker : Baker<BitingAuthoring>

@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 743023119}
   - component: {fileID: 743023120}
   m_Layer: 0
-  m_Name: Configs
+  m_Name: MainConfig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -183,20 +183,30 @@ MonoBehaviour:
   - {fileID: 4871536276139427349, guid: 201dbdc7264ef164bbde0cbfe53bafe1, type: 3}
   - {fileID: 4871536276139427349, guid: 8f55e350f9b948a43990d071c7c27d9b, type: 3}
   - {fileID: 4871536276139427349, guid: 110afb269c770e3419b382f848cd37b5, type: 3}
-  <BrainHiddenLayersSize>k__BackingField: 7
-  <BrainHiddenLayersCount>k__BackingField: 5
-  <ReceptorCooldown>k__BackingField: 0.5
-  <MinSeeingRange>k__BackingField: 10
-  <MaxSeeingRange>k__BackingField: 20
-  <MinAcceleration>k__BackingField: 1
-  <MaxAcceleration>k__BackingField: 3
-  <MaxSpeed>k__BackingField: 10
-  <MinDrag>k__BackingField: 0.35
-  <MinNutrients>k__BackingField: 60
-  <MaxNutrients>k__BackingField: 300
-  <NutrientLossPerSecond>k__BackingField: 1
-  <MinLifetime>k__BackingField: 30
-  <MaxLifetime>k__BackingField: 300
+  _world:
+    _bounds:
+      x: 10
+      y: 10
+    _impassibleBounds: 0
+  _thinking:
+    _hiddenLayerSize: 4
+    _hiddenLayersCount: 8
+  _seeing:
+    _cooldown: 0.5
+    _minRange: 10
+    _maxRange: 20
+  _movement:
+    _minAcceleration: 1
+    _maxAcceleration: 3
+    _maxSpeed: 10
+    _minDrag: 0.35
+  _diet:
+    _minNutrients: 60
+    _maxNutrients: 300
+    _nutrientLossPerSecond: 1
+  _life:
+    _minLifetime: 30
+    _maxLifetime: 300
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
