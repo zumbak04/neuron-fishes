@@ -54,7 +54,7 @@ namespace Brain
             return weights[index];
         }
     }
-
+    
     public struct ThoughOutput : IComponentData
     {
         // 7 элементов, 8 битов на каждый float2 + 4 бита на header

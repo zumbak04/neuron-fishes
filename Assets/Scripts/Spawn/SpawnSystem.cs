@@ -51,7 +51,8 @@ namespace Spawn
 
             foreach (var (request, entity) in SystemAPI.Query<RefRO<SpawnRandomFishRequest>>().WithEntityAccess()) {
                 for (int i = 0; i < request.ValueRO.count; i++) {
-                    Entity instance = ecb.Instantiate(fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].value);
+                    Entity prefab = fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].value;
+                    Entity instance = ecb.Instantiate(prefab);
 
                     ecb.SetComponent(instance, new LocalTransform() {
                             Position = new float3(random.NextFloat2(botLeftCorner, topRightCorner), 0),
@@ -64,13 +65,18 @@ namespace Spawn
                     ecb.SetComponent(instance, CreateMoving(config.movement._minAcceleration, config.movement._maxAcceleration, random));
                     ecb.SetComponent(instance, CreateNutritious(config.diet._minNutrients, config.diet._maxNutrients, random));
                     ecb.SetComponent(instance, CreateLasting(config.life._minLifetime, config.life._maxLifetime, random));
+                    if (SystemAPI.HasComponent<Synthesizing>(prefab)) {
+                        ecb.SetComponent(instance,
+                                         CreateSynthesizing(config.diet._synthesizing._minStrength, config.diet._synthesizing._maxStrength, random));
+                    }
                 }
                 ecb.DestroyEntity(entity);
             }
 
             foreach (var (request, entity) in SystemAPI.Query<RefRO<SpawnFishRequest>>().WithEntityAccess()) {
                 for (int i = 0; i < request.ValueRO.count; i++) {
-                    Entity instance = ecb.Instantiate(fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].value);
+                    Entity prefab = fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].value;
+                    Entity instance = ecb.Instantiate(prefab);
 
                     ecb.SetComponent(instance, new LocalTransform() {
                             Position = new float3(request.ValueRO.position, 0),
@@ -83,6 +89,9 @@ namespace Spawn
                     ecb.SetComponent(instance, request.ValueRO.moving);
                     ecb.SetComponent(instance, request.ValueRO.nutritious);
                     ecb.SetComponent(instance, request.ValueRO.lasting);
+                    if (SystemAPI.HasComponent<Synthesizing>(prefab)) {
+                        ecb.SetComponent(instance, request.ValueRO.synthesizing);
+                    }
                 }
                 ecb.DestroyEntity(entity);
             }
@@ -122,10 +131,10 @@ namespace Spawn
 
         private Nutritious CreateNutritious(float minNutrients, float maxNutrients, Random random)
         {
-            float nutrientsLimit = random.NextFloat(minNutrients, maxNutrients);
+            float limit = random.NextFloat(minNutrients, maxNutrients);
             return new Nutritious {
-                    cur = nutrientsLimit / 2,
-                    limit = nutrientsLimit,
+                    cur = DietUtils.CurNutrientsFromLimit(limit),
+                    limit = limit,
             };
         }
 
@@ -133,6 +142,13 @@ namespace Spawn
         {
             return new Lasting() {
                     lifetime = random.NextFloat(minLifetime, maxLifetime)
+            };
+        }
+
+        private Synthesizing CreateSynthesizing(float minStrength, float maxStrength, Random random)
+        {
+            return new Synthesizing() {
+                    strength = random.NextFloat(minStrength, maxStrength)
             };
         }
     }

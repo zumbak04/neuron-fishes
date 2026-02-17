@@ -1,6 +1,5 @@
 ﻿using Input;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace Camera

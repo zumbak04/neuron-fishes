@@ -164,9 +164,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <FishPrefabs>k__BackingField:
-  - {fileID: 2400066540473908070, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+  - {fileID: 4871536276139427349, guid: 205ab97900e83294ab28fce01cbe7d7a, type: 3}
   - {fileID: 4871536276139427349, guid: fd549f7e064fe35459e10372e6ef441d, type: 3}
-  - {fileID: 4871536276139427349, guid: adfb8c174c941b447a1346d4124418d5, type: 3}
   - {fileID: 4871536276139427349, guid: 9eb0f3058ade8bd429c5bac56da0aeee, type: 3}
   - {fileID: 4871536276139427349, guid: 451c5c23499cdec43897e14dfedb7972, type: 3}
   - {fileID: 4871536276139427349, guid: 2f1a73267c54f8d4dad0d58c12b4454a, type: 3}
@@ -176,17 +175,23 @@ MonoBehaviour:
   - {fileID: 4871536276139427349, guid: 7b254d07bb708fd4abf5468123fcc606, type: 3}
   - {fileID: 4871536276139427349, guid: e6586fda1af137a49924dea1a989e055, type: 3}
   - {fileID: 4871536276139427349, guid: 13ef94acd060a024a87b5b535ad8bafc, type: 3}
-  - {fileID: 4871536276139427349, guid: 51a0186e4ab2215499774b886f792819, type: 3}
   - {fileID: 4871536276139427349, guid: 674585b75a8951842bf2e821b0746b1e, type: 3}
   - {fileID: 4871536276139427349, guid: 9eeed6cfdd271e248886eb2ea390e547, type: 3}
   - {fileID: 4871536276139427349, guid: 9b93f8b941f3a1941b87a67e5f6ed094, type: 3}
   - {fileID: 4871536276139427349, guid: 201dbdc7264ef164bbde0cbfe53bafe1, type: 3}
   - {fileID: 4871536276139427349, guid: 8f55e350f9b948a43990d071c7c27d9b, type: 3}
   - {fileID: 4871536276139427349, guid: 110afb269c770e3419b382f848cd37b5, type: 3}
+  - {fileID: 4871536276139427349, guid: 51a0186e4ab2215499774b886f792819, type: 3}
+  - {fileID: 4871536276139427349, guid: 49fbc0ea153f99941815585d00f17c24, type: 3}
+  - {fileID: 4871536276139427349, guid: 54e834a38bd088c4c85cea953d0003f0, type: 3}
+  - {fileID: 4871536276139427349, guid: c6122dbed50523545983603c3ee745b6, type: 3}
+  - {fileID: 4871536276139427349, guid: 7ac16d50da259124ab09fb2c167dd302, type: 3}
+  - {fileID: 4871536276139427349, guid: 151d69854569a3f49abac70c2af90ae8, type: 3}
+  - {fileID: 4871536276139427349, guid: eb60c8d7223fe754fb2dbc6053357333, type: 3}
   _world:
     _bounds:
-      x: 10
-      y: 10
+      x: 100
+      y: 100
     _impassibleBounds: 0
   _thinking:
     _hiddenLayerSize: 4
@@ -204,6 +209,9 @@ MonoBehaviour:
     _minNutrients: 60
     _maxNutrients: 300
     _nutrientLossPerSecond: 1
+    _synthesizing:
+      _minStrength: 0.5
+      _maxStrength: 2
   _life:
     _minLifetime: 30
     _maxLifetime: 300

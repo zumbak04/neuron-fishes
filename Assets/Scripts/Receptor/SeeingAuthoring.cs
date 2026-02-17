@@ -30,6 +30,7 @@ namespace Receptor
         public float range;
     }
 
+    
     public struct SeeingOutputEvent : IComponentData, IEnableableComponent
     {
         // 7 элементов, 8 битов на каждый float2 + 4 бита на header

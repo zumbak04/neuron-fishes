@@ -17,7 +17,7 @@ namespace Spawn
         // todo zumbak временное решение
         void IInitializable.Initialize()
         {
-            SpawnRandomFishes(0);
+            SpawnRandomFishes(100);
         }
 
         public void SpawnRandomFishes(ushort count)

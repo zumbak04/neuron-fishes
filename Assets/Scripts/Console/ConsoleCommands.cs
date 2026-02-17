@@ -45,11 +45,15 @@ namespace Console
             };
 
             Nutritious nutritious = new() {
-                    cur = config.diet._maxNutrients / 2
+                    cur = DietUtils.CurNutrientsFromLimit(config.diet._maxNutrients)
             };
             
             Lasting lasting = new() {
                     lifetime = config.life._maxLifetime
+            };
+            
+            Synthesizing synthesizing = new() {
+                    strength = config.diet._synthesizing._maxStrength
             };
 
             UnityEngine.Camera current = UnityEngine.Camera.main;
@@ -61,7 +65,8 @@ namespace Console
                     seeing = seeing,
                     moving = moving,
                     nutritious = nutritious,
-                    lasting = lasting
+                    lasting = lasting,
+                    synthesizing = synthesizing
             };
             Resolve<SpawnService>().SpawnFish(request);
             Debug.Log($"Spawned curious fish on position={position}");

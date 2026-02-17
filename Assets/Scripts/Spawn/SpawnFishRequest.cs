@@ -17,5 +17,6 @@ namespace Spawn
         public Moving moving;
         public Nutritious nutritious;
         public Lasting lasting;
+        public Synthesizing synthesizing;
     }
 }
