@@ -6,13 +6,13 @@ namespace Input
 {
     public static class InputUtils
     {
-        public static bool IsPointerOverUI()
+        public static bool IsPointerOverUI(int pointerOrTouchId)
         {
             var module = EventSystem.current.currentInputModule as InputSystemUIInputModule;
             if (!module) {
-                return true;
+                return false;
             }
-            RaycastResult lastResult = module.GetLastRaycastResult(0);
+            RaycastResult lastResult = module.GetLastRaycastResult(pointerOrTouchId);
             GameObject? lastObject = lastResult.gameObject;
             return lastObject != null && lastObject.layer == LayerMask.NameToLayer("UI");
         }

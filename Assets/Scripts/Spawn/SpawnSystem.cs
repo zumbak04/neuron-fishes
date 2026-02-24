@@ -27,11 +27,11 @@ namespace Spawn
             state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<MainConfig>();
 
-            // todo zumbak Burst ругается на EntityQuery
-            EntityQuery requestQuery = state.GetEntityQuery(ComponentType.ReadOnly<SpawnFishRequest>());
-            EntityQuery randomRequestQuery = state.GetEntityQuery(ComponentType.ReadOnly<SpawnRandomFishRequest>());
+            NativeArray<EntityQuery> queries = new(2, Allocator.Temp);
+            queries[0] = new EntityQueryBuilder(Allocator.Temp).WithAll<SpawnFishRequest>().Build(ref state);
+            queries[1] = new EntityQueryBuilder(Allocator.Temp).WithAll<SpawnRandomFishRequest>().Build(ref state);
 
-            state.RequireAnyForUpdate(requestQuery, randomRequestQuery);
+            state.RequireAnyForUpdate(queries);
         }
 
         [BurstCompile]
@@ -133,7 +133,7 @@ namespace Spawn
         {
             float limit = random.NextFloat(minNutrients, maxNutrients);
             return new Nutritious {
-                    cur = DietUtils.CurNutrientsFromLimit(limit),
+                    current = DietUtils.CurNutrientsFromLimit(limit),
                     limit = limit,
             };
         }

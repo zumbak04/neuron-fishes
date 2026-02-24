@@ -17,7 +17,7 @@ namespace Diet
 
     public struct Nutritious : IComponentData
     {
-        public float cur;
+        public float current;
         public float limit;
     }
 }

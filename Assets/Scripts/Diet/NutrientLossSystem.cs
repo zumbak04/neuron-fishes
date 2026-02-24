@@ -25,9 +25,9 @@ namespace Diet
             
             // Synthesizing по дефолту не теряют nutrients
             foreach (var (health, entity) in SystemAPI.Query<RefRW<Nutritious>>().WithNone<Synthesizing>().WithEntityAccess()) {
-                health.ValueRW.cur -= config.diet._nutrientLossPerSecond * SystemAPI.Time.DeltaTime;
+                health.ValueRW.current -= config.diet._nutrientLossPerSecond * SystemAPI.Time.DeltaTime;
                 
-                if (health.ValueRO.cur <= 0) {
+                if (health.ValueRO.current <= 0) {
                     ecb.DestroyEntity(entity);
                 }
             }

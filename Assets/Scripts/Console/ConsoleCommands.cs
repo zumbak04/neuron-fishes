@@ -45,7 +45,7 @@ namespace Console
             };
 
             Nutritious nutritious = new() {
-                    cur = DietUtils.CurNutrientsFromLimit(config.diet._maxNutrients)
+                    current = DietUtils.CurNutrientsFromLimit(config.diet._maxNutrients)
             };
             
             Lasting lasting = new() {

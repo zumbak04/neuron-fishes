@@ -52,7 +52,7 @@ namespace Camera
 
         private void OnPanStarted(InputAction.CallbackContext _)
         {
-            if (InputUtils.IsPointerOverUI()) {
+            if (InputUtils.IsPointerOverUI(0)) {
                 return;
             }
             Panning = true;

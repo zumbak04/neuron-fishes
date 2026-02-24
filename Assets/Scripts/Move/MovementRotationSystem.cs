@@ -14,7 +14,6 @@ namespace Move
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<MainConfig>();
             state.RequireForUpdate<Moving>();
         }
         
