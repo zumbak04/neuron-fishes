@@ -1,15 +1,16 @@
 ﻿using Unity.Burst;
 using Unity.Entities;
 
-namespace Receptor
+namespace Sight
 {
     [BurstCompile, UpdateInGroup(typeof(LateSimulationSystemGroup))]
-    public partial struct SeeingDisableEventsSystem : ISystem
+    public partial struct SightDisableEventsSystem : ISystem
     {
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var triggeredEvent in SystemAPI.Query<EnabledRefRW<SeeingOutputEvent>>()) {
+            foreach (EnabledRefRW<SightOutputEvent> triggeredEvent in
+                     SystemAPI.Query<EnabledRefRW<SightOutputEvent>>()) {
                 triggeredEvent.ValueRW = false;
             }
         }

@@ -1,11 +1,17 @@
-﻿using Unity.Mathematics;
+﻿using System;
+using Unity.Mathematics;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Config
 {
-    [System.Serializable]
+    [Serializable]
     public struct WorldConfig
     {
-        public int2 _bounds;
-        public bool _impassibleBounds;
+        [field: SerializeField]
+        public int2 Bounds { get; private set; }
+
+        [field: SerializeField]
+        public bool ImpassibleBounds { get; private set; }
     }
 }

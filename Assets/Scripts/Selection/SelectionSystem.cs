@@ -16,20 +16,23 @@ namespace Selection
         public void OnUpdate(ref SystemState state)
         {
             var ecbSystem = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            // todo zumbak может вызывать sync points?
             var physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-            
+
             // todo zumbak посмотреть видос по ECS. Переделать в SystemBase? Вызывать SystemBase напрямую без SelectionService?
             EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
 
             Entity selectedEntity = Entity.Null;
-            foreach ((RefRO<SelectRequest> request, Entity requestEntity) in SystemAPI.Query<RefRO<SelectRequest>>().WithEntityAccess()) {
-                RaycastInput raycastInput = new RaycastInput() {
-                        Start = request.ValueRO.worldPoint,
-                        End = request.ValueRO.worldPoint
+            foreach ((RefRO<SelectRequest> request, Entity requestEntity) in
+                     SystemAPI.Query<RefRO<SelectRequest>>().WithEntityAccess()) {
+                var raycastInput = new RaycastInput {
+                    Start = request.ValueRO.WorldPoint,
+                    End = request.ValueRO.WorldPoint
                 };
                 if (physicsWorld.CastRay(raycastInput, out RaycastHit hit)) {
                     // hit.
                 }
+
                 ecb.DestroyEntity(requestEntity);
             }
         }

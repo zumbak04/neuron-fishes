@@ -14,9 +14,9 @@ namespace Move
             }
         }
     }
-    
+
     public struct Moving : IComponentData
     {
-        public float acceleration;
+        public float Acceleration;
     }
 }

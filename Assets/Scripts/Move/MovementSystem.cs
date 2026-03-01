@@ -1,8 +1,7 @@
 ﻿using Brain;
-using Config;
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
 
@@ -14,14 +13,29 @@ namespace Move
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<Moving>();
+            EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<PhysicsVelocity, Moving, ThoughOutput>().Build(ref state);
+            state.RequireForUpdate(query);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            foreach (var (velocity, moving, thoughOutput) in SystemAPI.Query<RefRW<PhysicsVelocity>, RefRO<Moving>, RefRO<ThoughOutput>>()) {
-                velocity.ValueRW.Linear.xy += thoughOutput.ValueRO.AverageValue * moving.ValueRO.acceleration * SystemAPI.Time.DeltaTime;
+            MoveByThoughJob moveByThoughJob = new() {
+                DeltaTime = SystemAPI.Time.DeltaTime
+            };
+            
+            state.Dependency = moveByThoughJob.ScheduleParallel(state.Dependency);
+        }
+        
+        [BurstCompile]
+        private partial struct MoveByThoughJob : IJobEntity
+        {
+            public float DeltaTime;
+            
+            private void Execute(ref PhysicsVelocity velocity, in Moving moving, in ThoughOutput thoughOutput)
+            {
+                velocity.Linear.xy += thoughOutput.AverageValue * moving.Acceleration * DeltaTime;
             }
         }
     }

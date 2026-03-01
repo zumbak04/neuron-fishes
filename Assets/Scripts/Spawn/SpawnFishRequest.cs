@@ -2,7 +2,7 @@
 using Diet;
 using Life;
 using Move;
-using Receptor;
+using Sight;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -10,13 +10,14 @@ namespace Spawn
 {
     public struct SpawnFishRequest : IComponentData
     {
-        public ushort count;
-        public float2 position;
-        public Thinking thinking;
-        public Seeing seeing;
-        public Moving moving;
-        public Nutritious nutritious;
-        public Lasting lasting;
-        public Synthesizing synthesizing;
+        public ushort Count;
+        public float2 Position;
+        public Thinking Thinking;
+        public Seeing Seeing;
+        public Moving Moving;
+        public Nutritious Nutritious;
+        public Lasting Lasting;
+        public Synthesizing Synthesizing;
+        public Biting Biting;
     }
 }

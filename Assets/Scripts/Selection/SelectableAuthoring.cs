@@ -23,6 +23,5 @@ namespace Selection
 
     public struct SelectedTag : IComponentData, IEnableableComponent
     {
-        
     }
 }

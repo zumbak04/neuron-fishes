@@ -188,33 +188,38 @@ MonoBehaviour:
   - {fileID: 4871536276139427349, guid: 7ac16d50da259124ab09fb2c167dd302, type: 3}
   - {fileID: 4871536276139427349, guid: 151d69854569a3f49abac70c2af90ae8, type: 3}
   - {fileID: 4871536276139427349, guid: eb60c8d7223fe754fb2dbc6053357333, type: 3}
-  _world:
-    _bounds:
+  <World>k__BackingField:
+    <Bounds>k__BackingField:
       x: 100
       y: 100
-    _impassibleBounds: 0
-  _thinking:
-    _hiddenLayerSize: 4
-    _hiddenLayersCount: 8
-  _seeing:
-    _cooldown: 0.5
-    _minRange: 10
-    _maxRange: 20
-  _movement:
-    _minAcceleration: 1
-    _maxAcceleration: 3
-    _maxSpeed: 10
-    _minDrag: 0.35
-  _diet:
-    _minNutrients: 60
-    _maxNutrients: 300
-    _nutrientLossPerSecond: 1
-    _synthesizing:
-      _minStrength: 0.5
-      _maxStrength: 2
-  _life:
-    _minLifetime: 30
-    _maxLifetime: 300
+    <ImpassibleBounds>k__BackingField: 0
+  <Thinking>k__BackingField:
+    <HiddenLayerSize>k__BackingField: 4
+    <HiddenLayersCount>k__BackingField: 8
+  <Seeing>k__BackingField:
+    <Cooldown>k__BackingField: 0.5
+    <MinRange>k__BackingField: 10
+    <MaxRange>k__BackingField: 20
+  <Movement>k__BackingField:
+    <MinAcceleration>k__BackingField: 1
+    <MaxAcceleration>k__BackingField: 3
+    <MaxSpeed>k__BackingField: 10
+    <MinDrag>k__BackingField: 0.35
+    <RotationSmoothness>k__BackingField: 3
+    <MaxAngularSpeed>k__BackingField: 6.28
+  <Diet>k__BackingField:
+    <MinNutrients>k__BackingField: 60
+    <MaxNutrients>k__BackingField: 300
+    <NutrientLossPerSecond>k__BackingField: 1
+    <Synthesizing>k__BackingField:
+      <MinStrength>k__BackingField: 0.5
+      <MaxStrength>k__BackingField: 2
+    <Biting>k__BackingField:
+      <MinStrength>k__BackingField: 10
+      <MaxStrength>k__BackingField: 100
+  <Life>k__BackingField:
+    <MinLifetime>k__BackingField: 60
+    <MaxLifetime>k__BackingField: 300
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

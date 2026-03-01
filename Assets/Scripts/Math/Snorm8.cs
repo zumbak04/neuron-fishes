@@ -10,10 +10,17 @@ namespace Math
 
         public Snorm8(float value)
         {
-            _data = (sbyte) (math.clamp(value, -1f, 1f) * PRECISION);
+            _data = (sbyte)(math.clamp(value, -1f, 1f) * PRECISION);
         }
 
-        public static implicit operator float(Snorm8 s) => s._data / PRECISION;
-        public static explicit operator Snorm8(float value) => new(value);
+        public static implicit operator float(Snorm8 s)
+        {
+            return s._data / PRECISION;
+        }
+
+        public static explicit operator Snorm8(float value)
+        {
+            return new Snorm8(value);
+        }
     }
 }

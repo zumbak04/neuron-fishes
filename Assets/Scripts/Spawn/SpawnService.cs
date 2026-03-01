@@ -13,11 +13,11 @@ namespace Spawn
         {
             _ecbSystem = ecbSystem;
         }
-        
+
         // todo zumbak временное решение
         void IInitializable.Initialize()
         {
-            SpawnRandomFishes(100);
+            SpawnRandomFishes(600);
         }
 
         public void SpawnRandomFishes(ushort count)
@@ -25,15 +25,15 @@ namespace Spawn
             EntityCommandBuffer ecb = _ecbSystem.CreateCommandBuffer();
 
             Entity entity = ecb.CreateEntity();
-            ecb.AddComponent(entity, new SpawnRandomFishRequest() {
-                    count = count
+            ecb.AddComponent(entity, new SpawnRandomFishRequest {
+                Count = count
             });
         }
 
         public void SpawnFish(SpawnFishRequest request)
         {
             EntityCommandBuffer ecb = _ecbSystem.CreateCommandBuffer();
-            
+
             Entity entity = ecb.CreateEntity();
             ecb.AddComponent(entity, request);
         }

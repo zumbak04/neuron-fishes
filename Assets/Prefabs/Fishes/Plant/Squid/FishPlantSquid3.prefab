@@ -76,13 +76,49 @@ PrefabInstance:
       propertyPath: m_Name
       value: FishPlantSquid3
       objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Height
+      value: 1.859865
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Radius
+      value: 0.20257983
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Center.y
+      value: 0.048185945
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Direction
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Height
+      value: 1.859865
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Radius
+      value: 0.20257983
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Center.y
+      value: 0.048185945
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Direction
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7355525368756703031, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Height
-      value: 1.6347587
+      value: 0.9670367
       objectReference: {fileID: 0}
     - target: {fileID: 7355525368756703031, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Radius
-      value: 0.2999903
+      value: 0.2218852
       objectReference: {fileID: 0}
     - target: {fileID: 7355525368756703031, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Center.x
@@ -90,7 +126,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7355525368756703031, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Center.y
-      value: 0.1048218
+      value: 0.4386828
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

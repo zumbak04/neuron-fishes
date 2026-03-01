@@ -4,7 +4,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace Receptor
+namespace Sight
 {
     public class SeeingAuthoring : MonoBehaviour
     {
@@ -14,26 +14,26 @@ namespace Receptor
             {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent<Seeing>(entity);
-                AddComponent(entity, new SeeingOutputEvent() {
-                        outputs = new FixedList32Bytes<float2>() {
-                                Length = ThinkingConsts.INPUT_SIZE
-                        }
+                AddComponent(entity, new SightOutputEvent {
+                    Outputs = new FixedList32Bytes<float2> {
+                        Length = ThinkingConsts.INPUT_SIZE
+                    }
                 });
-                SetComponentEnabled<SeeingOutputEvent>(entity, false);
+                SetComponentEnabled<SightOutputEvent>(entity, false);
             }
         }
     }
 
     public struct Seeing : IComponentData
     {
-        public float cooldown;
-        public float range;
+        public float Cooldown;
+        public float Range;
     }
 
-    
-    public struct SeeingOutputEvent : IComponentData, IEnableableComponent
+    public struct SightOutputEvent : IComponentData, IEnableableComponent
     {
+        // todo zumbak передавать нормализованный вектор. Это должно убрать кружение вокруг цели.
         // 7 элементов, 8 битов на каждый float2 + 4 бита на header
-        public FixedList64Bytes<float2> outputs;
+        public FixedList64Bytes<float2> Outputs;
     }
 }

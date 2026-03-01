@@ -76,6 +76,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: FishPlant1
       objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Height
+      value: 0.5725084
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Radius
+      value: 0.20720828
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Center.y
+      value: 0.7079786
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Height
+      value: 0.5725084
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Radius
+      value: 0.20720828
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Center.y
+      value: 0.7079786
+      objectReference: {fileID: 0}
     - target: {fileID: 7355525368756703031, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Height
       value: 1.4572064

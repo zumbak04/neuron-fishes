@@ -11,7 +11,8 @@ namespace Diet
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            EntityQuery query = new EntityQueryBuilder(Allocator.Temp).WithAll<Nutritious, Synthesizing>().Build(ref state);
+            EntityQuery query = new EntityQueryBuilder(Allocator.Temp).WithAll<Nutritious, Synthesizing>()
+                .Build(ref state);
             state.RequireForUpdate(query);
         }
 
@@ -19,8 +20,9 @@ namespace Diet
         public void OnUpdate(ref SystemState state)
         {
             foreach (var (nutritious, synthesizing) in SystemAPI.Query<RefRW<Nutritious>, RefRO<Synthesizing>>()) {
-                float maxDelta = nutritious.ValueRO.limit - nutritious.ValueRO.current;
-                nutritious.ValueRW.current += math.min(maxDelta, synthesizing.ValueRO.strength * SystemAPI.Time.DeltaTime);
+                float maxDelta = nutritious.ValueRO.Limit - nutritious.ValueRO.Current;
+                nutritious.ValueRW.Current +=
+                    math.min(maxDelta, synthesizing.ValueRO.Strength * SystemAPI.Time.DeltaTime);
             }
         }
     }

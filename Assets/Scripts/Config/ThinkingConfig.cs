@@ -1,9 +1,16 @@
-﻿namespace Config
+﻿using System;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Config
 {
-    [System.Serializable]
+    [Serializable]
     public struct ThinkingConfig
     {
-        public ushort _hiddenLayerSize;
-        public ushort _hiddenLayersCount;
+        [field: SerializeField]
+        public ushort HiddenLayerSize { get; private set; }
+
+        [field: SerializeField]
+        public ushort HiddenLayersCount { get; private set; }
     }
 }

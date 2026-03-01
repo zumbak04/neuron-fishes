@@ -4,11 +4,10 @@ namespace Parallax
 {
     public class ParallaxLayer : MonoBehaviour
     {
-        [field: SerializeField]
-        public float Factor { get; private set; }
-        [field: SerializeField]
-        public Sprite Image { get; private set; }
-        
+        [field: SerializeField] public float Factor { get; private set; }
+
+        [field: SerializeField] public Sprite Image { get; private set; } = null!;
+
         private Bounds _bounds;
         private Bounds _cameraBounds;
 
@@ -20,7 +19,7 @@ namespace Parallax
 
             GameObject firstImageObject = new("Image 1");
             firstImageObject.transform.SetParent(transform);
-            SpriteRenderer firstRenderer = firstImageObject.AddComponent<SpriteRenderer>();
+            var firstRenderer = firstImageObject.AddComponent<SpriteRenderer>();
             firstRenderer.sprite = Image;
             firstRenderer.sortingOrder = orderInLayer;
 
@@ -47,14 +46,18 @@ namespace Parallax
             if (_cameraBounds.extents == Vector3.zero) {
                 return;
             }
+
             if (_cameraBounds.max.x < cameraPosition.x) {
                 transform.Translate(new Vector3(_bounds.size.x / 2, 0));
-            } else if (_cameraBounds.min.x > cameraPosition.x) {
+            }
+            else if (_cameraBounds.min.x > cameraPosition.x) {
                 transform.Translate(new Vector3(-_bounds.size.x / 2, 0));
             }
+
             if (_cameraBounds.max.y < cameraPosition.y) {
                 transform.Translate(new Vector3(0, _bounds.size.y / 2));
-            } else if (_cameraBounds.min.y > cameraPosition.y) {
+            }
+            else if (_cameraBounds.min.y > cameraPosition.y) {
                 transform.Translate(new Vector3(0, -_bounds.size.y / 2));
             }
 

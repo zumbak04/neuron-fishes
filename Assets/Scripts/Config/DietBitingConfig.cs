@@ -5,12 +5,12 @@ using UnityEngine.Serialization;
 namespace Config
 {
     [Serializable]
-    public struct LifeConfig
+    public struct DietBitingConfig
     {
         [field: SerializeField]
-        public float MinLifetime { get; private set; }
+        public float MinStrength { get; private set; }
 
         [field: SerializeField]
-        public float MaxLifetime { get; private set; }
+        public float MaxStrength { get; private set; }
     }
 }

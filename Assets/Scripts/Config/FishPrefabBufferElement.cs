@@ -4,6 +4,6 @@ namespace Config
 {
     public struct FishPrefabBufferElement : IBufferElementData
     {
-        public Entity value;
+        public Entity Value;
     }
 }

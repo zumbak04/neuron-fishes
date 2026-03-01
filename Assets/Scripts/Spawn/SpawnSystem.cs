@@ -4,7 +4,7 @@ using Diet;
 using Life;
 using Math;
 using Move;
-using Receptor;
+using Sight;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -39,116 +39,143 @@ namespace Spawn
         {
             var config = SystemAPI.GetSingleton<MainConfig>();
             var ecbSystem = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-            DynamicBuffer<FishPrefabBufferElement> fishPrefabBuffer = SystemAPI.GetSingletonBuffer<FishPrefabBufferElement>();
+            DynamicBuffer<FishPrefabBufferElement> fishPrefabBuffer =
+                SystemAPI.GetSingletonBuffer<FishPrefabBufferElement>();
 
-            int2 botLeftCorner = WorldBoundsUtils.GetBotLeftCorner(config.world._bounds);
-            int2 topRightCorner = WorldBoundsUtils.GetTopRightCorner(config.world._bounds);
+            int2 botLeftCorner = WorldBoundsUtils.GetBotLeftCorner(config.World.Bounds);
+            int2 topRightCorner = WorldBoundsUtils.GetTopRightCorner(config.World.Bounds);
 
             EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
-            uint seed = (uint) (SystemAPI.Time.ElapsedTime * 1000) + 1;
+            uint seed = (uint)(SystemAPI.Time.ElapsedTime * 1000) + 1;
             Random random = new(seed);
             int fishPrefabsCount = fishPrefabBuffer.Length;
 
             foreach (var (request, entity) in SystemAPI.Query<RefRO<SpawnRandomFishRequest>>().WithEntityAccess()) {
-                for (int i = 0; i < request.ValueRO.count; i++) {
-                    Entity prefab = fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].value;
+                for (var i = 0; i < request.ValueRO.Count; i++) {
+                    Entity prefab = fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].Value;
                     Entity instance = ecb.Instantiate(prefab);
 
-                    ecb.SetComponent(instance, new LocalTransform() {
-                            Position = new float3(random.NextFloat2(botLeftCorner, topRightCorner), 0),
-                            Scale = 1f,
-                            Rotation = quaternion.identity
+                    ecb.SetComponent(instance, new LocalTransform {
+                        Position = new float3(random.NextFloat2(botLeftCorner, topRightCorner), 0),
+                        Scale = 1f,
+                        Rotation = quaternion.identity
                     });
 
-                    ecb.SetComponent(instance, CreateBrain(config.thinking._hiddenLayerSize, config.thinking._hiddenLayersCount, random));
-                    ecb.SetComponent(instance, CreateReceptor(config.seeing._minRange, config.seeing._maxRange, random));
-                    ecb.SetComponent(instance, CreateMoving(config.movement._minAcceleration, config.movement._maxAcceleration, random));
-                    ecb.SetComponent(instance, CreateNutritious(config.diet._minNutrients, config.diet._maxNutrients, random));
-                    ecb.SetComponent(instance, CreateLasting(config.life._minLifetime, config.life._maxLifetime, random));
+                    ecb.SetComponent(instance,
+                        CreateBrain(config.Thinking.HiddenLayerSize, config.Thinking.HiddenLayersCount, ref random));
+                    ecb.SetComponent(instance, CreateReceptor(config.Seeing.MinRange, config.Seeing.MaxRange, ref random));
+                    ecb.SetComponent(instance,
+                        CreateMoving(config.Movement.MinAcceleration, config.Movement.MaxAcceleration, ref random));
+                    ecb.SetComponent(instance,
+                        CreateNutritious(config.Diet.MinNutrients, config.Diet.MaxNutrients, ref random));
+                    ecb.SetComponent(instance, CreateLasting(config.Life.MinLifetime, config.Life.MaxLifetime, ref random));
                     if (SystemAPI.HasComponent<Synthesizing>(prefab)) {
                         ecb.SetComponent(instance,
-                                         CreateSynthesizing(config.diet._synthesizing._minStrength, config.diet._synthesizing._maxStrength, random));
+                            CreateSynthesizing(config.Diet.Synthesizing.MinStrength,
+                                config.Diet.Synthesizing.MaxStrength,
+                                ref random));
+                    }
+
+                    if (SystemAPI.HasComponent<Biting>(prefab)) {
+                        // Нужно рандомизировать Strength не трогая лучи
+                        var biting = SystemAPI.GetComponent<Biting>(prefab);
+                        biting.Strength =
+                            random.NextFloat(config.Diet.Biting.MinStrength, config.Diet.Biting.MaxStrength);
+                        ecb.SetComponent(instance, biting);
                     }
                 }
+
                 ecb.DestroyEntity(entity);
             }
 
             foreach (var (request, entity) in SystemAPI.Query<RefRO<SpawnFishRequest>>().WithEntityAccess()) {
-                for (int i = 0; i < request.ValueRO.count; i++) {
-                    Entity prefab = fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].value;
+                for (var i = 0; i < request.ValueRO.Count; i++) {
+                    Entity prefab = fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].Value;
                     Entity instance = ecb.Instantiate(prefab);
 
-                    ecb.SetComponent(instance, new LocalTransform() {
-                            Position = new float3(request.ValueRO.position, 0),
-                            Scale = 1f,
-                            Rotation = quaternion.identity
+                    ecb.SetComponent(instance, new LocalTransform {
+                        Position = new float3(request.ValueRO.Position, 0),
+                        Scale = 1f,
+                        Rotation = quaternion.identity
                     });
 
-                    ecb.SetComponent(instance, request.ValueRO.thinking);
-                    ecb.SetComponent(instance, request.ValueRO.seeing);
-                    ecb.SetComponent(instance, request.ValueRO.moving);
-                    ecb.SetComponent(instance, request.ValueRO.nutritious);
-                    ecb.SetComponent(instance, request.ValueRO.lasting);
+                    ecb.SetComponent(instance, request.ValueRO.Thinking);
+                    ecb.SetComponent(instance, request.ValueRO.Seeing);
+                    ecb.SetComponent(instance, request.ValueRO.Moving);
+                    ecb.SetComponent(instance, request.ValueRO.Nutritious);
+                    ecb.SetComponent(instance, request.ValueRO.Lasting);
                     if (SystemAPI.HasComponent<Synthesizing>(prefab)) {
-                        ecb.SetComponent(instance, request.ValueRO.synthesizing);
+                        ecb.SetComponent(instance, request.ValueRO.Synthesizing);
+                    }
+                    
+                    if (SystemAPI.HasComponent<Biting>(prefab)) {
+                        // Нужно задать Strength не трогая лучи
+                        var biting = SystemAPI.GetComponent<Biting>(prefab);
+                        biting.Strength = request.ValueRO.Biting.Strength;
+                        ecb.SetComponent(instance, biting);
                     }
                 }
+
                 ecb.DestroyEntity(entity);
             }
         }
 
-        private Thinking CreateBrain(ushort hiddenLayersSize, ushort hiddenLayersCount, Random random)
+        private Thinking CreateBrain(ushort hiddenLayersSize, ushort hiddenLayersCount, ref Random random)
         {
-            FixedList32Bytes<ushort> layerSizes = new();
-            layerSizes.Length = 2 + hiddenLayersCount;
-            layerSizes[0] = ThinkingConsts.INPUT_SIZE;
+            FixedList32Bytes<ushort> layerSizes = new() {
+                Length = 2 + hiddenLayersCount,
+                [0] = ThinkingConsts.INPUT_SIZE
+            };
             layerSizes[^1] = ThinkingConsts.OUTPUT_SIZE;
 
             for (ushort i = 0; i < hiddenLayersCount; i++) {
                 layerSizes[i + 1] = hiddenLayersSize;
             }
+
             Thinking thinking = new(layerSizes);
 
-            for (int i = 0; i < thinking.weights.Length; i++) {
-                thinking.weights[i] = (Snorm8) random.NextFloat(ThinkingConsts.MIN_NODE_WEIGHT, ThinkingConsts.MAX_NODE_WEIGHT);
+            for (var i = 0; i < thinking.Weights.Length; i++) {
+                thinking.Weights[i] =
+                    (Snorm8)random.NextFloat(ThinkingConsts.MIN_NODE_WEIGHT, ThinkingConsts.MAX_NODE_WEIGHT);
             }
+
             return thinking;
         }
 
-        private Seeing CreateReceptor(float minRange, float maxRange, Random random)
+        private Seeing CreateReceptor(float minRange, float maxRange, ref Random random)
         {
             return new Seeing {
-                    range = random.NextFloat(minRange, maxRange)
+                Range = random.NextFloat(minRange, maxRange)
             };
         }
 
-        private Moving CreateMoving(float minAcceleration, float maxAccelaration, Random random)
+        private Moving CreateMoving(float minAcceleration, float maxAcceleration, ref Random random)
         {
             return new Moving {
-                    acceleration = random.NextFloat(minAcceleration, maxAccelaration)
+                Acceleration = random.NextFloat(minAcceleration, maxAcceleration)
             };
         }
 
-        private Nutritious CreateNutritious(float minNutrients, float maxNutrients, Random random)
+        private Nutritious CreateNutritious(float minNutrients, float maxNutrients, ref Random random)
         {
             float limit = random.NextFloat(minNutrients, maxNutrients);
             return new Nutritious {
-                    current = DietUtils.CurNutrientsFromLimit(limit),
-                    limit = limit,
+                Current = DietUtils.CurNutrientsFromLimit(limit),
+                Limit = limit
             };
         }
 
-        private Lasting CreateLasting(float minLifetime, float maxLifetime, Random random)
+        private Lasting CreateLasting(float minLifetime, float maxLifetime, ref Random random)
         {
-            return new Lasting() {
-                    lifetime = random.NextFloat(minLifetime, maxLifetime)
+            return new Lasting {
+                Lifetime = random.NextFloat(minLifetime, maxLifetime)
             };
         }
 
-        private Synthesizing CreateSynthesizing(float minStrength, float maxStrength, Random random)
+        private Synthesizing CreateSynthesizing(float minStrength, float maxStrength, ref Random random)
         {
-            return new Synthesizing() {
-                    strength = random.NextFloat(minStrength, maxStrength)
+            return new Synthesizing {
+                Strength = random.NextFloat(minStrength, maxStrength)
             };
         }
     }

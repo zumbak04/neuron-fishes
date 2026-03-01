@@ -5,6 +5,6 @@ namespace Selection
 {
     public struct SelectRequest : IComponentData
     {
-        public float3 worldPoint;
+        public float3 WorldPoint;
     }
 }

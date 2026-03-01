@@ -1,5 +1,4 @@
-﻿using Unity.Burst;
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 
 namespace Math
 {

@@ -4,6 +4,6 @@ namespace Spawn
 {
     public struct SpawnRandomFishRequest : IComponentData
     {
-        public ushort count;
+        public ushort Count;
     }
 }

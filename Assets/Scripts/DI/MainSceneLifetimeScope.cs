@@ -12,11 +12,11 @@ namespace DI
         protected override void Configure(IContainerBuilder builder)
         {
             builder.Register<InputService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
-            
+
             builder.Register<SpawnService>(Lifetime.Scoped).AsSelf().AsImplementedInterfaces();
             builder.RegisterSystemFromDefaultWorld<EndSimulationEntityCommandBufferSystem>();
-            
-            ConsoleCommands.scope = this;
+
+            ConsoleCommands.Scope = this;
         }
     }
 }

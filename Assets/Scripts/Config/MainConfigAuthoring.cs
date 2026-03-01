@@ -1,51 +1,52 @@
 ﻿using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Config
 {
     // todo zumbak вынести в ScriptableObject
     public class MainConfigAuthoring : MonoBehaviour
     {
-        [field: SerializeField]
+        [field: SerializeField] 
         public List<GameObject> FishPrefabs { get; private set; }
 
-        [SerializeField]
-        public WorldConfig _world;
+        [field: SerializeField]
+        public WorldConfig World { get; private set; }
 
-        [SerializeField]
-        public ThinkingConfig _thinking;
-        
-        [SerializeField]
-        public SeeingConfig _seeing;
+        [field: SerializeField]
+        public ThinkingConfig Thinking { get; private set; }
 
-        [SerializeField]
-        public MovementConfig _movement;
+        [field: SerializeField]
+        public SeeingConfig Seeing { get; private set; }
 
-        [SerializeField]
-        public DietConfig _diet;
-        
-        [SerializeField]
-        public LifeConfig _life;
+        [field: SerializeField]
+        public MovementConfig Movement { get; private set; }
+
+        [field: SerializeField]
+        public DietConfig Diet { get; private set; }
+
+        [field: SerializeField]
+        public LifeConfig Life { get; private set; }
 
         private class Baker : Baker<MainConfigAuthoring>
         {
             public override void Bake(MainConfigAuthoring authoring)
             {
                 Entity entity = GetEntity(TransformUsageFlags.None);
-                AddComponent(entity, new MainConfig() {
-                        world = authoring._world,
-                        thinking = authoring._thinking,
-                        seeing = authoring._seeing,
-                        movement = authoring._movement,
-                        diet = authoring._diet,
-                        life = authoring._life
+                AddComponent(entity, new MainConfig {
+                    World = authoring.World,
+                    Thinking = authoring.Thinking,
+                    Seeing = authoring.Seeing,
+                    Movement = authoring.Movement,
+                    Diet = authoring.Diet,
+                    Life = authoring.Life
                 });
 
                 DynamicBuffer<FishPrefabBufferElement> buffer = AddBuffer<FishPrefabBufferElement>(entity);
                 foreach (GameObject fishPrefab in authoring.FishPrefabs) {
-                    buffer.Add(new FishPrefabBufferElement() {
-                            value = GetEntity(fishPrefab, TransformUsageFlags.Dynamic)
+                    buffer.Add(new FishPrefabBufferElement {
+                        Value = GetEntity(fishPrefab, TransformUsageFlags.Dynamic)
                     });
                 }
             }
@@ -54,16 +55,16 @@ namespace Config
 
     public struct MainConfig : IComponentData
     {
-        public WorldConfig world;
+        public WorldConfig World;
 
-        public ThinkingConfig thinking;
+        public ThinkingConfig Thinking;
 
-        public SeeingConfig seeing;
+        public SeeingConfig Seeing;
 
-        public MovementConfig movement;
+        public MovementConfig Movement;
 
-        public DietConfig diet;
+        public DietConfig Diet;
 
-        public LifeConfig life;
+        public LifeConfig Life;
     }
 }

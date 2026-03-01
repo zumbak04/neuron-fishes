@@ -7,26 +7,27 @@ namespace Camera
     [RequireComponent(typeof(UnityEngine.Camera))]
     public class CameraMover : MonoBehaviour
     {
-        [field: SerializeField]
-        public float ZoomSpeed { get; private set; } = 2;
-        [field: SerializeField]
-        public int MaxZoom { get; private set; } = 30;
-        [field: SerializeField]
-        public int MinZoom { get; private set; } = 5;
-        
-        public bool Panning { get; private set; }
-        
-        private Vector2 _prevPanPosition;
-        private UnityEngine.Camera _camera;
-        
+        [field: SerializeField] public float ZoomSpeed { get; private set; } = 2;
+
+        [field: SerializeField] public int MaxZoom { get; private set; } = 30;
+
+        [field: SerializeField] public int MinZoom { get; private set; } = 5;
+
         private InputAction _activatePanAction;
+        private UnityEngine.Camera _camera;
         private InputAction _pointAction;
+
+        private Vector2 _prevPanPosition;
         private InputAction _zoomAction;
+
+        public bool Panning { get; private set; }
+
+        private Vector2 PointWorldPosition => _camera.ScreenToWorldPoint(_pointAction.ReadValue<Vector2>());
 
         private void Awake()
         {
             _camera = GetComponent<UnityEngine.Camera>();
-            
+
             _activatePanAction = InputSystem.actions.FindAction(InputActionConsts.WORLD_ACTIVATE_PAN_NAME, true);
             _pointAction = InputSystem.actions.FindAction(InputActionConsts.WORLD_POINT_NAME, true);
             _zoomAction = InputSystem.actions.FindAction(InputActionConsts.WORLD_ZOOM_NAME, true);
@@ -46,7 +47,7 @@ namespace Camera
             _pointAction.performed -= OnPointPerformed;
             _activatePanAction.canceled -= OnPanEnded;
             _zoomAction.performed -= OnZoomPerformed;
-            
+
             Panning = false;
         }
 
@@ -55,6 +56,7 @@ namespace Camera
             if (InputUtils.IsPointerOverUI(0)) {
                 return;
             }
+
             Panning = true;
             _prevPanPosition = PointWorldPosition;
             Debug.Log("Pan started");
@@ -65,11 +67,12 @@ namespace Camera
             if (!Panning) {
                 return;
             }
+
             Vector2 panPosition = _camera.ScreenToWorldPoint(context.ReadValue<Vector2>());
             Vector2 panDelta = _prevPanPosition - panPosition;
-            
+
             transform.Translate(panDelta, Space.World);
-            
+
             _prevPanPosition = panPosition + panDelta;
         }
 
@@ -78,15 +81,16 @@ namespace Camera
             if (!Panning) {
                 return;
             }
+
             Panning = false;
             Debug.Log("Pan ended");
         }
 
         private void OnZoomPerformed(InputAction.CallbackContext context)
         {
-            _camera.orthographicSize = Mathf.Clamp(_camera.orthographicSize - context.ReadValue<Vector2>().y * ZoomSpeed, MinZoom, MaxZoom);
+            _camera.orthographicSize = Mathf.Clamp(
+                _camera.orthographicSize - context.ReadValue<Vector2>().y * ZoomSpeed,
+                MinZoom, MaxZoom);
         }
-
-        private Vector2 PointWorldPosition => _camera.ScreenToWorldPoint(_pointAction.ReadValue<Vector2>());
     }
 }

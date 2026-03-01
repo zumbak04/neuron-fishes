@@ -1,10 +1,19 @@
-﻿namespace Config
+﻿using System;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Config
 {
-    [System.Serializable]
+    [Serializable]
     public struct SeeingConfig
     {
-        public float _cooldown;
-        public ushort _minRange;
-        public ushort _maxRange;
+        [field: SerializeField]
+        public float Cooldown { get; private set; }
+
+        [field: SerializeField]
+        public ushort MinRange { get; private set; }
+
+        [field: SerializeField]
+        public ushort MaxRange { get; private set; }
     }
 }

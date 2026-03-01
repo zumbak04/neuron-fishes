@@ -74,11 +74,47 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2400066540473908070, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Name
-      value: FishSquid1
+      value: FishBiteSquid1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Height
+      value: 1.8579167
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Radius
+      value: 0.3122128
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Center.y
+      value: 0.17646807
+      objectReference: {fileID: 0}
+    - target: {fileID: 2721492850863012490, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Direction
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Height
+      value: 1.8579167
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Radius
+      value: 0.3122128
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Center.y
+      value: 0.17646807
+      objectReference: {fileID: 0}
+    - target: {fileID: 3147288323992203179, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
+      propertyPath: m_Direction
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7355525368756703031, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Height
-      value: 1.5353687
+      value: 1.00962
       objectReference: {fileID: 0}
     - target: {fileID: 7355525368756703031, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Radius
@@ -86,11 +122,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7355525368756703031, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Center.x
-      value: 0.004342377
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7355525368756703031, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       propertyPath: m_Center.y
-      value: 0.23231566
+      value: 0.49519002
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -98,14 +134,14 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2400066540473908070, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5627568788529792828}
+      addedObject: {fileID: 6058872086878456120}
   m_SourcePrefab: {fileID: 100100000, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
 --- !u!1 &4871536276139427349 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2400066540473908070, guid: 62fee8172919e9d43b41c5aba8744fb0, type: 3}
   m_PrefabInstance: {fileID: 7121760716990135667}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5627568788529792828
+--- !u!114 &6058872086878456120
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -114,6 +150,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 4871536276139427349}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5e8ae1fcbdf457c898845b2ee4edebc, type: 3}
+  m_Script: {fileID: 11500000, guid: 4119ed49a4a5449b8fbed867e97d0c24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  RaycastStart: {x: 0, y: 1.01}
+  RaycastDirection: {x: 0, y: 0.25}

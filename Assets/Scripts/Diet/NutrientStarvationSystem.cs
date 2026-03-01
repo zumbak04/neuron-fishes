@@ -1,16 +1,17 @@
 ﻿using Unity.Burst;
 using Unity.Entities;
 
-namespace Life
+namespace Diet
 {
-    [BurstCompile]
-    public partial struct LifetimeSystem : ISystem
+    [BurstCompile, UpdateAfter(typeof(NutrientLossSystem)), UpdateAfter(typeof(BiteSystem)),
+     UpdateAfter(typeof(SynthesisSystem))]
+    public partial struct NutrientStarvationSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
-            state.RequireForUpdate<Lasting>();
+            state.RequireForUpdate<Nutritious>();
         }
 
         [BurstCompile]
@@ -20,10 +21,8 @@ namespace Life
 
             EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach (var (lasting, entity) in SystemAPI.Query<RefRW<Lasting>>().WithEntityAccess()) {
-                lasting.ValueRW.Lifetime -= SystemAPI.Time.DeltaTime;
-
-                if (lasting.ValueRO.Lifetime <= 0) {
+            foreach (var (nutritious, entity) in SystemAPI.Query<RefRO<Nutritious>>().WithEntityAccess()) {
+                if (nutritious.ValueRO.Current <= 0) {
                     ecb.DestroyEntity(entity);
                 }
             }

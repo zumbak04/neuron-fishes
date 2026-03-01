@@ -9,13 +9,14 @@ namespace Camera
     [RequireComponent(typeof(UnityEngine.Camera))]
     public class CameraRaycaster : MonoBehaviour
     {
+        [Inject] private SelectionService _selectionService;
+
         private UnityEngine.Camera _camera;
 
-        [Inject]
-        private SelectionService _selectionService;
-        
-        private InputAction _selectAction;
         private InputAction _pointAction;
+        private InputAction _selectAction;
+
+        private Vector3 PointWorldPosition => _camera.ScreenToWorldPoint(_pointAction.ReadValue<Vector2>());
 
         private void Awake()
         {
@@ -34,7 +35,5 @@ namespace Camera
         {
             _selectionService.Select(PointWorldPosition);
         }
-        
-        private Vector3 PointWorldPosition => _camera.ScreenToWorldPoint(_pointAction.ReadValue<Vector2>());
     }
 }

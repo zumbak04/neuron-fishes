@@ -12,6 +12,7 @@ namespace Input
             if (!module) {
                 return false;
             }
+
             RaycastResult lastResult = module.GetLastRaycastResult(pointerOrTouchId);
             GameObject? lastObject = lastResult.gameObject;
             return lastObject != null && lastObject.layer == LayerMask.NameToLayer("UI");

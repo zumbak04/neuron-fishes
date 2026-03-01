@@ -4,6 +4,6 @@ namespace Selection
 {
     public struct SelectionState
     {
-        public Entity value;
+        public Entity Value;
     }
 }

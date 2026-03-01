@@ -1,9 +1,16 @@
-﻿namespace Config
+﻿using System;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace Config
 {
-    [System.Serializable]
+    [Serializable]
     public struct DietSynthesizingConfig
     {
-        public float _minStrength;
-        public float _maxStrength;
+        [field: SerializeField]
+        public float MinStrength { get; private set; }
+
+        [field: SerializeField]
+        public float MaxStrength { get; private set; }
     }
 }

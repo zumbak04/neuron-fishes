@@ -17,6 +17,6 @@ namespace Life
 
     public struct Lasting : IComponentData
     {
-        public float lifetime;
+        public float Lifetime;
     }
 }

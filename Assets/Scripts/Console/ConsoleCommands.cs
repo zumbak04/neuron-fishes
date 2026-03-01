@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using Life;
 using Math;
 using Move;
-using Receptor;
+using Sight;
 using Spawn;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -20,53 +20,59 @@ namespace Console
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public static class ConsoleCommands
     {
-        public static LifetimeScope scope;
+        public static LifetimeScope Scope;
 
         [ConsoleMethod("spawn.curiousFish", "Спавнит любопытную рыбу в центре камеры")]
         public static void SpawnCuriousFish()
         {
-            MainConfig config = WorldUtils.GetSingleton<MainConfig>();
+            var config = WorldUtils.GetSingleton<MainConfig>();
 
             FixedList32Bytes<ushort> brainLayerSizes = new() {
-                    ThinkingConsts.INPUT_SIZE,
-                    ThinkingConsts.OUTPUT_SIZE
+                ThinkingConsts.INPUT_SIZE,
+                ThinkingConsts.OUTPUT_SIZE
             };
             Thinking thinking = new(brainLayerSizes);
-            for (int i = 0; i < thinking.weights.Length; i++) {
-                thinking.weights[i] = (Snorm8) 1f;
+            for (var i = 0; i < thinking.Weights.Length; i++) {
+                thinking.Weights[i] = (Snorm8)1f;
             }
 
             Seeing seeing = new() {
-                    range = config.seeing._maxRange
+                Range = config.Seeing.MaxRange
             };
 
             Moving moving = new() {
-                    acceleration = config.movement._maxAcceleration
+                Acceleration = config.Movement.MaxAcceleration
             };
 
             Nutritious nutritious = new() {
-                    current = DietUtils.CurNutrientsFromLimit(config.diet._maxNutrients)
+                Current = DietUtils.CurNutrientsFromLimit(config.Diet.MaxNutrients),
+                Limit = config.Diet.MaxNutrients
             };
-            
+
             Lasting lasting = new() {
-                    lifetime = config.life._maxLifetime
+                Lifetime = config.Life.MaxLifetime
             };
-            
+
             Synthesizing synthesizing = new() {
-                    strength = config.diet._synthesizing._maxStrength
+                Strength = config.Diet.Synthesizing.MaxStrength
+            };
+
+            Biting biting = new() {
+                Strength = config.Diet.Biting.MaxStrength
             };
 
             UnityEngine.Camera current = UnityEngine.Camera.main;
             float2 position = current!.transform.position.ToFloat2();
             SpawnFishRequest request = new() {
-                    count = 1,
-                    position = position,
-                    thinking = thinking,
-                    seeing = seeing,
-                    moving = moving,
-                    nutritious = nutritious,
-                    lasting = lasting,
-                    synthesizing = synthesizing
+                Count = 1,
+                Position = position,
+                Thinking = thinking,
+                Seeing = seeing,
+                Moving = moving,
+                Nutritious = nutritious,
+                Lasting = lasting,
+                Synthesizing = synthesizing,
+                Biting = biting
             };
             Resolve<SpawnService>().SpawnFish(request);
             Debug.Log($"Spawned curious fish on position={position}");
@@ -78,6 +84,9 @@ namespace Console
             Time.timeScale = value;
         }
 
-        private static T Resolve<T>() => scope.Container.Resolve<T>();
+        private static T Resolve<T>()
+        {
+            return Scope.Container.Resolve<T>();
+        }
     }
 }

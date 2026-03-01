@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Diet
 {
-    // todo zumbak
     public class SynthesizingAuthoring : MonoBehaviour
     {
         private class Baker : Baker<SynthesizingAuthoring>
@@ -15,9 +14,9 @@ namespace Diet
             }
         }
     }
-    
+
     public struct Synthesizing : IComponentData
     {
-        public float strength;
+        public float Strength;
     }
 }
