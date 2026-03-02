@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Config
 {
@@ -10,9 +9,6 @@ namespace Config
     {
         [field: SerializeField] 
         public List<GameObject> FishPrefabs { get; private set; }
-
-        [field: SerializeField]
-        public WorldConfig World { get; private set; }
 
         [field: SerializeField]
         public ThinkingConfig Thinking { get; private set; }
@@ -35,7 +31,6 @@ namespace Config
             {
                 Entity entity = GetEntity(TransformUsageFlags.None);
                 AddComponent(entity, new MainConfig {
-                    World = authoring.World,
                     Thinking = authoring.Thinking,
                     Seeing = authoring.Seeing,
                     Movement = authoring.Movement,
@@ -43,9 +38,9 @@ namespace Config
                     Life = authoring.Life
                 });
 
-                DynamicBuffer<FishPrefabBufferElement> buffer = AddBuffer<FishPrefabBufferElement>(entity);
+                var fishPrefabs = AddBuffer<FishPrefabBufferElement>(entity);
                 foreach (GameObject fishPrefab in authoring.FishPrefabs) {
-                    buffer.Add(new FishPrefabBufferElement {
+                    fishPrefabs.Add(new FishPrefabBufferElement {
                         Value = GetEntity(fishPrefab, TransformUsageFlags.Dynamic)
                     });
                 }
@@ -55,8 +50,6 @@ namespace Config
 
     public struct MainConfig : IComponentData
     {
-        public WorldConfig World;
-
         public ThinkingConfig Thinking;
 
         public SeeingConfig Seeing;

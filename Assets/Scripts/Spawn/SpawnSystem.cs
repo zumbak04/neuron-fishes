@@ -37,13 +37,14 @@ namespace Spawn
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var config = SystemAPI.GetSingleton<MainConfig>();
+            var mainConfig = SystemAPI.GetSingleton<MainConfig>();
+            var worldConfig = SystemAPI.GetSingleton<WorldConfig>();
             var ecbSystem = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             DynamicBuffer<FishPrefabBufferElement> fishPrefabBuffer =
                 SystemAPI.GetSingletonBuffer<FishPrefabBufferElement>();
 
-            int2 botLeftCorner = WorldBoundsUtils.GetBotLeftCorner(config.World.Bounds);
-            int2 topRightCorner = WorldBoundsUtils.GetTopRightCorner(config.World.Bounds);
+            float2 botLeftCorner = WorldBoundsUtils.GetBotLeftCorner(worldConfig.Bounds) + worldConfig.HalfBoundStep;
+            float2 topRightCorner = WorldBoundsUtils.GetTopRightCorner(worldConfig.Bounds) - worldConfig.HalfBoundStep;
 
             EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
             uint seed = (uint)(SystemAPI.Time.ElapsedTime * 1000) + 1;
@@ -62,17 +63,19 @@ namespace Spawn
                     });
 
                     ecb.SetComponent(instance,
-                        CreateBrain(config.Thinking.HiddenLayerSize, config.Thinking.HiddenLayersCount, ref random));
-                    ecb.SetComponent(instance, CreateReceptor(config.Seeing.MinRange, config.Seeing.MaxRange, ref random));
+                        CreateBrain(mainConfig.Thinking.HiddenLayerSize, mainConfig.Thinking.HiddenLayersCount, ref random));
                     ecb.SetComponent(instance,
-                        CreateMoving(config.Movement.MinAcceleration, config.Movement.MaxAcceleration, ref random));
+                        CreateSeeing(mainConfig.Seeing.MinRange, mainConfig.Seeing.MaxRange, ref random));
                     ecb.SetComponent(instance,
-                        CreateNutritious(config.Diet.MinNutrients, config.Diet.MaxNutrients, ref random));
-                    ecb.SetComponent(instance, CreateLasting(config.Life.MinLifetime, config.Life.MaxLifetime, ref random));
+                        CreateMoving(mainConfig.Movement.MinAcceleration, mainConfig.Movement.MaxAcceleration, ref random));
+                    ecb.SetComponent(instance,
+                        CreateNutritious(mainConfig.Diet.MinNutrients, mainConfig.Diet.MaxNutrients, ref random));
+                    ecb.SetComponent(instance,
+                        CreateLasting(mainConfig.Life.MinLifetime, mainConfig.Life.MaxLifetime, ref random));
                     if (SystemAPI.HasComponent<Synthesizing>(prefab)) {
                         ecb.SetComponent(instance,
-                            CreateSynthesizing(config.Diet.Synthesizing.MinStrength,
-                                config.Diet.Synthesizing.MaxStrength,
+                            CreateSynthesizing(mainConfig.Diet.Synthesizing.MinStrength,
+                                mainConfig.Diet.Synthesizing.MaxStrength,
                                 ref random));
                     }
 
@@ -80,7 +83,7 @@ namespace Spawn
                         // Нужно рандомизировать Strength не трогая лучи
                         var biting = SystemAPI.GetComponent<Biting>(prefab);
                         biting.Strength =
-                            random.NextFloat(config.Diet.Biting.MinStrength, config.Diet.Biting.MaxStrength);
+                            random.NextFloat(mainConfig.Diet.Biting.MinStrength, mainConfig.Diet.Biting.MaxStrength);
                         ecb.SetComponent(instance, biting);
                     }
                 }
@@ -107,7 +110,7 @@ namespace Spawn
                     if (SystemAPI.HasComponent<Synthesizing>(prefab)) {
                         ecb.SetComponent(instance, request.ValueRO.Synthesizing);
                     }
-                    
+
                     if (SystemAPI.HasComponent<Biting>(prefab)) {
                         // Нужно задать Strength не трогая лучи
                         var biting = SystemAPI.GetComponent<Biting>(prefab);
@@ -142,7 +145,7 @@ namespace Spawn
             return thinking;
         }
 
-        private Seeing CreateReceptor(float minRange, float maxRange, ref Random random)
+        private Seeing CreateSeeing(float minRange, float maxRange, ref Random random)
         {
             return new Seeing {
                 Range = random.NextFloat(minRange, maxRange)

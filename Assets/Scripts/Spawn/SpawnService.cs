@@ -1,10 +1,9 @@
 ﻿using Unity.Entities;
 using VContainer;
-using VContainer.Unity;
 
 namespace Spawn
 {
-    public class SpawnService : IInitializable
+    public class SpawnService
     {
         private readonly EndSimulationEntityCommandBufferSystem _ecbSystem;
 
@@ -12,12 +11,6 @@ namespace Spawn
         public SpawnService(EndSimulationEntityCommandBufferSystem ecbSystem)
         {
             _ecbSystem = ecbSystem;
-        }
-
-        // todo zumbak временное решение
-        void IInitializable.Initialize()
-        {
-            SpawnRandomFishes(600);
         }
 
         public void SpawnRandomFishes(ushort count)

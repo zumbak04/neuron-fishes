@@ -25,7 +25,7 @@ namespace Console
         [ConsoleMethod("spawn.curiousFish", "Спавнит любопытную рыбу в центре камеры")]
         public static void SpawnCuriousFish()
         {
-            var config = WorldUtils.GetSingleton<MainConfig>();
+            var config = EcsWorldUtils.GetSingleton<MainConfig>();
 
             FixedList32Bytes<ushort> brainLayerSizes = new() {
                 ThinkingConsts.INPUT_SIZE,

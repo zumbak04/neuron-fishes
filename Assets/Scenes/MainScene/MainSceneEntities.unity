@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 743023119}
   - component: {fileID: 743023120}
+  - component: {fileID: 743023121}
   m_Layer: 0
   m_Name: MainConfig
   m_TagString: Untagged
@@ -188,11 +189,6 @@ MonoBehaviour:
   - {fileID: 4871536276139427349, guid: 7ac16d50da259124ab09fb2c167dd302, type: 3}
   - {fileID: 4871536276139427349, guid: 151d69854569a3f49abac70c2af90ae8, type: 3}
   - {fileID: 4871536276139427349, guid: eb60c8d7223fe754fb2dbc6053357333, type: 3}
-  <World>k__BackingField:
-    <Bounds>k__BackingField:
-      x: 100
-      y: 100
-    <ImpassibleBounds>k__BackingField: 0
   <Thinking>k__BackingField:
     <HiddenLayerSize>k__BackingField: 4
     <HiddenLayersCount>k__BackingField: 8
@@ -220,6 +216,33 @@ MonoBehaviour:
   <Life>k__BackingField:
     <MinLifetime>k__BackingField: 60
     <MaxLifetime>k__BackingField: 300
+--- !u!114 &743023121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743023118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1552cc9a9434c0b89cfb6b0bd25a438, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Bounds>k__BackingField:
+    x: 200
+    y: 200
+  <ImpassibleBounds>k__BackingField: 1
+  <BoundStep>k__BackingField: 4
+  <HorizontalBoundPrefabs>k__BackingField:
+  - {fileID: 6170802137842812465, guid: ee7e5960cecdfa843beca102173f1b48, type: 3}
+  - {fileID: 4068173828558984108, guid: 2aba995b37c12d34d9f438f10197ab00, type: 3}
+  <VerticalBoundPrefabs>k__BackingField:
+  - {fileID: 4068173828558984108, guid: 4ae2799e05807d5499a8bda7862e29db, type: 3}
+  - {fileID: 4068173828558984108, guid: f879cbd10b7b8df438dacb7a50ccbe2c, type: 3}
+  <NorthEastBoundCornerPrefab>k__BackingField: {fileID: 4068173828558984108, guid: c9487790acf013d4da90958d7627e5c6, type: 3}
+  <NorthWestBoundCornerPrefab>k__BackingField: {fileID: 4068173828558984108, guid: 418095d8fd21bd34e8da9c82e0ff3e0a, type: 3}
+  <SouthEastBoundCornerPrefab>k__BackingField: {fileID: 4068173828558984108, guid: 521e6b4b607960f46bfdf65f70549eeb, type: 3}
+  <SouthWestBoundCornerPrefab>k__BackingField: {fileID: 4068173828558984108, guid: 64c976c4d2d49554b8e40bfeb3569e55, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

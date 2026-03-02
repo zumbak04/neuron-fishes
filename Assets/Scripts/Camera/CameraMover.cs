@@ -1,6 +1,10 @@
 ﻿using Input;
+using Math;
+using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using World;
 
 namespace Camera
 {
@@ -12,13 +16,14 @@ namespace Camera
         [field: SerializeField] public int MaxZoom { get; private set; } = 30;
 
         [field: SerializeField] public int MinZoom { get; private set; } = 5;
-
-        private InputAction _activatePanAction;
+        
         private UnityEngine.Camera _camera;
+        private InputAction _activatePanAction;
         private InputAction _pointAction;
-
-        private Vector2 _prevPanPosition;
         private InputAction _zoomAction;
+        private EntityQuery _worldConfigQuery;
+        
+        private Vector2 _prevPanPosition;
 
         public bool Panning { get; private set; }
 
@@ -31,6 +36,9 @@ namespace Camera
             _activatePanAction = InputSystem.actions.FindAction(InputActionConsts.WORLD_ACTIVATE_PAN_NAME, true);
             _pointAction = InputSystem.actions.FindAction(InputActionConsts.WORLD_POINT_NAME, true);
             _zoomAction = InputSystem.actions.FindAction(InputActionConsts.WORLD_ZOOM_NAME, true);
+            
+            EntityManager em = Unity.Entities.World.DefaultGameObjectInjectionWorld.EntityManager;
+            _worldConfigQuery = em.CreateEntityQuery(ComponentType.ReadOnly<WorldConfig>());
         }
 
         private void OnEnable()
@@ -67,11 +75,18 @@ namespace Camera
             if (!Panning) {
                 return;
             }
+            WorldConfig worldConfig = _worldConfigQuery.GetSingleton<WorldConfig>();
 
             Vector2 panPosition = _camera.ScreenToWorldPoint(context.ReadValue<Vector2>());
             Vector2 panDelta = _prevPanPosition - panPosition;
 
-            transform.Translate(panDelta, Space.World);
+            Vector3 targetPosition = transform.position + new Vector3(panDelta.x, panDelta.y);
+            if (worldConfig.ImpassibleBounds) {
+                float2 topRightCorner = WorldBoundsUtils.GetTopRightCorner(worldConfig.Bounds);
+                float2 botLeftCorner = WorldBoundsUtils.GetBotLeftCorner(worldConfig.Bounds);
+                targetPosition = MathUtils.Clamp(targetPosition, botLeftCorner, topRightCorner);
+            }
+            transform.position = targetPosition;
 
             _prevPanPosition = panPosition + panDelta;
         }

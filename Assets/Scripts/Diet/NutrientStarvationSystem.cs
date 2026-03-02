@@ -3,8 +3,7 @@ using Unity.Entities;
 
 namespace Diet
 {
-    [BurstCompile, UpdateAfter(typeof(NutrientLossSystem)), UpdateAfter(typeof(BiteSystem)),
-     UpdateAfter(typeof(SynthesisSystem))]
+    [BurstCompile, UpdateAfter(typeof(NutrientLossSystem)), UpdateAfter(typeof(SynthesisSystem))]
     public partial struct NutrientStarvationSystem : ISystem
     {
         [BurstCompile]

@@ -4,21 +4,24 @@ namespace World
 {
     public static class WorldBoundsUtils
     {
-        public static int2 GetBotLeftCorner(int2 worldBounds)
+        public static float2 GetBotLeftCorner(float2 worldBounds)
         {
-            return new int2(-worldBounds.x / 2, -worldBounds.y / 2);
+            return new float2(-worldBounds.x / 2, -worldBounds.y / 2);
+        }
+        
+        public static float2 GetBotRightCorner(float2 worldBounds)
+        {
+            return new float2(worldBounds.x / 2, -worldBounds.y / 2);
         }
 
-        public static int2 GetTopRightCorner(int2 worldBounds)
+        public static float2 GetTopRightCorner(float2 worldBounds)
         {
-            return new int2(worldBounds.x / 2, worldBounds.y / 2);
+            return new float2(worldBounds.x / 2, worldBounds.y / 2);
         }
-
-        public static float3 GetRandomPosition(int2 worldBounds, Random random)
+        
+        public static float2 GetTopLeftCorner(float2 worldBounds)
         {
-            int2 botLeftCorner = GetBotLeftCorner(worldBounds);
-            int2 topRightCorner = GetTopRightCorner(worldBounds);
-            return new float3(random.NextFloat2(botLeftCorner, topRightCorner), 0);
+            return new float2(-worldBounds.x / 2, worldBounds.y / 2);
         }
     }
 }
