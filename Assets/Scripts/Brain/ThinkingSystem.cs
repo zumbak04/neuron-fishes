@@ -21,30 +21,39 @@ namespace Brain
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            FixedList32Bytes<float> currValues = new() {
-                Length = ThinkingConsts.MAX_LAYER_SIZE
-            };
-            FixedList32Bytes<float> nextValues = new() {
-                Length = ThinkingConsts.MAX_LAYER_SIZE
-            };
+            ThinkJob thinkJob = new();
 
-            foreach (var (brain, output, receptorEvent) in SystemAPI
-                         .Query<RefRO<Thinking>, RefRW<ThoughOutput>, RefRO<SightOutputEvent>>()) {
+            state.Dependency = thinkJob.ScheduleParallel(state.Dependency);
+        }
+
+        [BurstCompile]
+        private partial struct ThinkJob : IJobEntity
+        {
+            private void Execute(in Thinking thinking, in SightOutputEvent sightOutputEvent,
+                ref ThoughOutput thoughOutput)
+            {
+                FixedList32Bytes<float> currValues = new() {
+                    Length = ThinkingConsts.MAX_LAYER_SIZE
+                };
+                FixedList32Bytes<float> nextValues = new() {
+                    Length = ThinkingConsts.MAX_LAYER_SIZE
+                };
+
                 // Заполняем prevValues изначальными данными из рецептора
-                for (var i = 0; i < receptorEvent.ValueRO.Outputs.Length; i++) {
-                    currValues[i] = math.lengthsq(receptorEvent.ValueRO.Outputs[i]);
+                for (var i = 0; i < sightOutputEvent.Outputs.Length; i++) {
+                    currValues[i] = math.lengthsq(sightOutputEvent.Outputs[i]);
                 }
 
-                for (ushort i = 0; i < brain.ValueRO.LayerSizes.Length - 1; i++) {
-                    ushort currLayerSize = brain.ValueRO.LayerSizes[i];
-                    ushort nextLayerSize = brain.ValueRO.LayerSizes[i + 1];
+                for (ushort i = 0; i < thinking.LayerSizes.Length - 1; i++) {
+                    ushort currLayerSize = thinking.LayerSizes[i];
+                    ushort nextLayerSize = thinking.LayerSizes[i + 1];
 
                     for (ushort nextNode = 0; nextNode < nextLayerSize; nextNode++) {
                         float sumSignal = 0;
 
                         for (ushort currNode = 0; currNode < currLayerSize; currNode++) {
                             float signal = currValues[currNode];
-                            float weight = brain.ValueRO.GetWeight(i, nextNode, currNode);
+                            float weight = thinking.GetWeight(i, nextNode, currNode);
 
                             sumSignal += signal * weight;
                         }
@@ -56,8 +65,8 @@ namespace Brain
                 }
 
                 // Заполняем ThoughOutput полученными данными
-                for (var i = 0; i < receptorEvent.ValueRO.Outputs.Length; i++) {
-                    output.ValueRW.Values[i] = MathUtils.Clamp(receptorEvent.ValueRO.Outputs[i] * nextValues[i], 1);
+                for (var i = 0; i < sightOutputEvent.Outputs.Length; i++) {
+                    thoughOutput.Values[i] = MathUtils.Clamp(sightOutputEvent.Outputs[i] * nextValues[i], 1);
                 }
             }
         }
