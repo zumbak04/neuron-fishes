@@ -9,9 +9,8 @@ namespace Sight
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            foreach (EnabledRefRW<SightOutputEvent> triggeredEvent in
-                     SystemAPI.Query<EnabledRefRW<SightOutputEvent>>()) {
-                triggeredEvent.ValueRW = false;
+            foreach (var seenEventEnabled in SystemAPI.Query<EnabledRefRW<SeenEvent>>()) {
+                seenEventEnabled.ValueRW = false;
             }
         }
     }

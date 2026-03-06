@@ -7,13 +7,13 @@ using World;
 
 namespace Core
 {
-    public class GameService : IAsyncStartable
+    public class InitService : IAsyncStartable
     {
         private readonly SpawnService _spawnService;
         private readonly WorldBoundsService _worldBoundsService;
         
         [Inject]
-        public GameService(SpawnService spawnService, WorldBoundsService worldBoundsService)
+        public InitService(SpawnService spawnService, WorldBoundsService worldBoundsService)
         {
             _spawnService = spawnService;
             _worldBoundsService = worldBoundsService;
@@ -25,7 +25,7 @@ namespace Core
             await UniTask.WaitUntil(() => Unity.Entities.World.DefaultGameObjectInjectionWorld != null, cancellationToken: cancellation);
             
             _worldBoundsService.Create();
-            _spawnService.SpawnRandomFishes(600);
+            _spawnService.SpawnFishes(600);
         }
     }
 }

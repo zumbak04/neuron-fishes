@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Unity.Entities;
+﻿using Unity.Entities;
 using UnityEngine;
 
 namespace Config
@@ -7,9 +6,6 @@ namespace Config
     // todo zumbak вынести в ScriptableObject
     public class MainConfigAuthoring : MonoBehaviour
     {
-        [field: SerializeField] 
-        public List<GameObject> FishPrefabs { get; private set; }
-
         [field: SerializeField]
         public ThinkingConfig Thinking { get; private set; }
 
@@ -37,13 +33,6 @@ namespace Config
                     Diet = authoring.Diet,
                     Life = authoring.Life
                 });
-
-                var fishPrefabs = AddBuffer<FishPrefabBufferElement>(entity);
-                foreach (GameObject fishPrefab in authoring.FishPrefabs) {
-                    fishPrefabs.Add(new FishPrefabBufferElement {
-                        Value = GetEntity(fishPrefab, TransformUsageFlags.Dynamic)
-                    });
-                }
             }
         }
     }

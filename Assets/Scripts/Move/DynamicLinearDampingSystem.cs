@@ -8,8 +8,8 @@ using Unity.Physics.Systems;
 
 namespace Move
 {
-    [BurstCompile, UpdateInGroup(typeof(AfterPhysicsSystemGroup)), UpdateBefore(typeof(MovementSystem))]
-    public partial struct MovementDragSystem : ISystem
+    [BurstCompile, UpdateInGroup(typeof(BeforePhysicsSystemGroup))]
+    public partial struct DynamicLinearDampingSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
@@ -26,27 +26,25 @@ namespace Move
             var config = SystemAPI.GetSingleton<MainConfig>();
             float maxSpeedSq = math.lengthsq(config.Movement.MaxSpeed);
 
-            ApplyDragJob applyDragJob = new() {
+            CalculateDampingJob calculateDampingJob = new() {
                 MaxSpeedSq = maxSpeedSq,
-                MinDrag = config.Movement.MinDrag,
-                DeltaTime = SystemAPI.Time.DeltaTime
+                MinDamping = config.Movement.MinDamping
             };
 
-            state.Dependency = applyDragJob.ScheduleParallel(state.Dependency);
+            state.Dependency = calculateDampingJob.ScheduleParallel(state.Dependency);
         }
-
+        
         [BurstCompile, WithAll(typeof(Moving))]
-        private partial struct ApplyDragJob : IJobEntity
+        private partial struct CalculateDampingJob : IJobEntity
         {
             public float MaxSpeedSq;
-            public float MinDrag;
-            public float DeltaTime;
+            public float MinDamping;
 
-            private void Execute(ref PhysicsVelocity velocity)
+            private void Execute(ref PhysicsDamping damping, in PhysicsVelocity velocity)
             {
                 float speedRatio = math.lengthsq(velocity.Linear.xy) / MaxSpeedSq;
-                float drag = math.lerp(MinDrag, 1, math.saturate(speedRatio));
-                velocity.Linear.xy *= math.exp(- drag * DeltaTime);
+                float linearDamping = math.lerp(MinDamping, 1, math.saturate(speedRatio));
+                damping.Linear = linearDamping;
             }
         }
     }

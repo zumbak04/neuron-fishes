@@ -44,11 +44,11 @@ namespace Sight
         {
             var config = SystemAPI.GetSingleton<MainConfig>();
 
-            // Сначала уменьшаем cooldown и смотрим есть ли вообще работа в этом кадре
+            // Уменьшаем Cooldown и смотрим есть ли вообще работа в этом кадре
             var anyToUpdate = false;
-            foreach (RefRW<Seeing> receptor in SystemAPI.Query<RefRW<Seeing>>()) {
-                if (receptor.ValueRO.Cooldown > 0) {
-                    receptor.ValueRW.Cooldown -= SystemAPI.Time.DeltaTime;
+            foreach (var seeing in SystemAPI.Query<RefRW<Seeing>>()) {
+                if (seeing.ValueRO.Cooldown > 0) {
+                    seeing.ValueRW.Cooldown -= SystemAPI.Time.DeltaTime;
                 }
                 else {
                     anyToUpdate = true;
@@ -75,7 +75,7 @@ namespace Sight
                 Writer = _spatialHash.AsParallelWriter()
             }.ScheduleParallel(state.Dependency);
 
-            state.Dependency = new SeeSpatialTargetsJob {
+            state.Dependency = new TrySeeSpatialTargetsJob {
                 Cooldown = config.Seeing.Cooldown,
                 CellSize = cellSize,
                 Hash = _spatialHash
@@ -101,8 +101,8 @@ namespace Sight
             }
         }
 
-        [BurstCompile, WithDisabled(typeof(SightOutputEvent))]
-        private partial struct SeeSpatialTargetsJob : IJobEntity
+        [BurstCompile, WithDisabled(typeof(SeenEvent))]
+        private partial struct TrySeeSpatialTargetsJob : IJobEntity
         {
             public float Cooldown;
             public float CellSize;
@@ -112,16 +112,16 @@ namespace Sight
             // todo zumbak нужно уменшить Cognitive Complexity
             private void Execute(Entity entity,
                 ref Seeing seeing,
-                ref SightOutputEvent triggeredEvent,
-                EnabledRefRW<SightOutputEvent> triggeredEventEnabled,
+                ref SeenEvent seenEvent,
+                EnabledRefRW<SeenEvent> seenEventEnabled,
                 in LocalTransform transform)
             {
                 if (seeing.Cooldown > 0) {
                     // Гарантируем, что событие выключено.
-                    triggeredEventEnabled.ValueRW = false;
+                    seenEventEnabled.ValueRW = false;
                     return;
                 }
-
+                
                 seeing.Cooldown = Cooldown;
 
                 float2 selfPos = transform.Position.xy;
@@ -157,13 +157,13 @@ namespace Sight
                     } while (Hash.TryGetNextValue(out hashItem, ref iterator));
                 }
 
-                triggeredEvent.Outputs.Length = ThinkingConsts.INPUT_SIZE;
-                triggeredEvent.Outputs[0] = fishTarget.To;
+                seenEvent.ToTargets.Length = ThinkingConsts.INPUT_SIZE;
+                seenEvent.ToTargets[0] = fishTarget.To;
                 // todo zumbak
-                triggeredEvent.Outputs[1] = float2.zero;
-                triggeredEvent.Outputs[2] = float2.zero;
+                seenEvent.ToTargets[1] = float2.zero;
+                seenEvent.ToTargets[2] = float2.zero;
 
-                triggeredEventEnabled.ValueRW = true;
+                seenEventEnabled.ValueRW = true;
             }
         }
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Math
 {
-    public static class Vector2IntExtensions
+    public static class VectorExtensions
     {
         public static int2 ToInt2(this Vector2Int value)
         {

@@ -5,11 +5,10 @@ namespace Math
 {
     public static class MathUtils
     {
-        public static float2 Clamp(float2 value, float lenght)
+        public static float2 Clamp(float2 value, float maxLenght)
         {
-            float lenghtSq = math.lengthsq(lenght);
-            float inversedLenght = math.rsqrt(lenghtSq);
-            float factor = math.min(1, inversedLenght);
+            float lenghtSq = math.lengthsq(value);
+            float factor = math.min(1, maxLenght * math.rsqrt(lenghtSq));
             return value * factor;
         }
 

@@ -7,7 +7,6 @@ using Unity.Mathematics;
 
 namespace Brain
 {
-    // todo zumbak надо оптимизировать и добавить Jobs
     [BurstCompile, UpdateAfter(typeof(SightSystem))]
     public partial struct ThinkingSystem : ISystem
     {
@@ -15,7 +14,7 @@ namespace Brain
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<Thinking>();
-            state.RequireForUpdate<SightOutputEvent>();
+            state.RequireForUpdate<SeenEvent>();
         }
 
         [BurstCompile]
@@ -29,7 +28,7 @@ namespace Brain
         [BurstCompile]
         private partial struct ThinkJob : IJobEntity
         {
-            private void Execute(in Thinking thinking, in SightOutputEvent sightOutputEvent,
+            private void Execute(in Thinking thinking, in SeenEvent seenEvent,
                 ref ThoughOutput thoughOutput)
             {
                 FixedList32Bytes<float> currValues = new() {
@@ -40,8 +39,8 @@ namespace Brain
                 };
 
                 // Заполняем prevValues изначальными данными из рецептора
-                for (var i = 0; i < sightOutputEvent.Outputs.Length; i++) {
-                    currValues[i] = math.lengthsq(sightOutputEvent.Outputs[i]);
+                for (var i = 0; i < seenEvent.ToTargets.Length; i++) {
+                    currValues[i] = math.lengthsq(seenEvent.ToTargets[i]);
                 }
 
                 for (ushort i = 0; i < thinking.LayerSizes.Length - 1; i++) {
@@ -58,15 +57,15 @@ namespace Brain
                             sumSignal += signal * weight;
                         }
 
-                        nextValues[nextNode] = math.clamp(sumSignal, -1, 1);
+                        nextValues[nextNode] = sumSignal;
                     }
 
                     currValues = nextValues;
                 }
 
                 // Заполняем ThoughOutput полученными данными
-                for (var i = 0; i < sightOutputEvent.Outputs.Length; i++) {
-                    thoughOutput.Values[i] = MathUtils.Clamp(sightOutputEvent.Outputs[i] * nextValues[i], 1);
+                for (var i = 0; i < seenEvent.ToTargets.Length; i++) {
+                    thoughOutput.Values[i] = MathUtils.Clamp(seenEvent.ToTargets[i] * currValues[i], 1);
                 }
             }
         }

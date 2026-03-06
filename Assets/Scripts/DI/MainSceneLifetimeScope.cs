@@ -15,7 +15,7 @@ namespace DI
         {
             builder.Register<InputService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
 
-            builder.Register<GameService>(Lifetime.Scoped).AsSelf().AsImplementedInterfaces();
+            builder.Register<InitService>(Lifetime.Scoped).AsSelf().AsImplementedInterfaces();
             builder.Register<SpawnService>(Lifetime.Scoped).AsSelf();
             builder.Register<WorldBoundsService>(Lifetime.Scoped).AsSelf();
             builder.RegisterSystemFromDefaultWorld<EndSimulationEntityCommandBufferSystem>();

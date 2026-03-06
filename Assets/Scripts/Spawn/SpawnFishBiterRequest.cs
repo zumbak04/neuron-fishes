@@ -8,7 +8,7 @@ using Unity.Mathematics;
 
 namespace Spawn
 {
-    public struct SpawnFishRequest : IComponentData
+    public struct SpawnFishBiterRequest : IComponentData
     {
         public ushort Count;
         public float2 Position;
@@ -17,7 +17,6 @@ namespace Spawn
         public Moving Moving;
         public Nutritious Nutritious;
         public Lasting Lasting;
-        public Synthesizing Synthesizing;
         public Biting Biting;
     }
 }

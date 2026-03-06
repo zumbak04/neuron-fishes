@@ -15,9 +15,6 @@ using Random = Unity.Mathematics.Random;
 
 namespace Spawn
 {
-    // todo zumbak есть сомнения в необходимости этой системы. Тут два варианта:
-    // todo zumbak 1. Пусть SpawnService сам создает рыб через EndSimulationEntityCommandBufferSystem
-    // todo zumbak 2. Сделать SystemBase и зарегать в VContainer
     [BurstCompile]
     public partial struct SpawnSystem : ISystem
     {
@@ -26,10 +23,13 @@ namespace Spawn
         {
             state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
             state.RequireForUpdate<MainConfig>();
+            state.RequireForUpdate<WorldConfig>();
+            state.RequireForUpdate<SpawnConfig>();
 
-            NativeArray<EntityQuery> queries = new(2, Allocator.Temp);
-            queries[0] = new EntityQueryBuilder(Allocator.Temp).WithAll<SpawnFishRequest>().Build(ref state);
-            queries[1] = new EntityQueryBuilder(Allocator.Temp).WithAll<SpawnRandomFishRequest>().Build(ref state);
+            NativeArray<EntityQuery> queries = new(3, Allocator.Temp);
+            queries[0] = new EntityQueryBuilder(Allocator.Temp).WithAll<SpawnFishBiterRequest>().Build(ref state);
+            queries[1] = new EntityQueryBuilder(Allocator.Temp).WithAll<SpawnFishPlantRequest>().Build(ref state);
+            queries[2] = new EntityQueryBuilder(Allocator.Temp).WithAll<SpawnFishesRequest>().Build(ref state);
 
             state.RequireAnyForUpdate(queries);
         }
@@ -39,9 +39,13 @@ namespace Spawn
         {
             var mainConfig = SystemAPI.GetSingleton<MainConfig>();
             var worldConfig = SystemAPI.GetSingleton<WorldConfig>();
+            var spawnConfig = SystemAPI.GetSingleton<SpawnConfig>();
+
             var ecbSystem = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-            DynamicBuffer<FishPrefabBufferElement> fishPrefabBuffer =
-                SystemAPI.GetSingletonBuffer<FishPrefabBufferElement>();
+            DynamicBuffer<FishBiterPrefabBufferElement> fishBiterPrefabs =
+                SystemAPI.GetSingletonBuffer<FishBiterPrefabBufferElement>();
+            DynamicBuffer<FishPlantPrefabBufferElement> fishPlantPrefabs =
+                SystemAPI.GetSingletonBuffer<FishPlantPrefabBufferElement>();
 
             float2 botLeftCorner = WorldBoundsUtils.GetBotLeftCorner(worldConfig.Bounds) + worldConfig.HalfBoundStep;
             float2 topRightCorner = WorldBoundsUtils.GetTopRightCorner(worldConfig.Bounds) - worldConfig.HalfBoundStep;
@@ -49,51 +53,26 @@ namespace Spawn
             EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
             uint seed = (uint)(SystemAPI.Time.ElapsedTime * 1000) + 1;
             Random random = new(seed);
-            int fishPrefabsCount = fishPrefabBuffer.Length;
-
-            foreach (var (request, entity) in SystemAPI.Query<RefRO<SpawnRandomFishRequest>>().WithEntityAccess()) {
+            
+            foreach (var (request, entity) in SystemAPI.Query<RefRO<SpawnFishesRequest>>().WithEntityAccess()) {
                 for (var i = 0; i < request.ValueRO.Count; i++) {
-                    Entity prefab = fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].Value;
-                    Entity instance = ecb.Instantiate(prefab);
-
-                    ecb.SetComponent(instance, new LocalTransform {
-                        Position = new float3(random.NextFloat2(botLeftCorner, topRightCorner), 0),
-                        Scale = 1f,
-                        Rotation = quaternion.identity
-                    });
-
-                    ecb.SetComponent(instance,
-                        CreateBrain(mainConfig.Thinking.HiddenLayerSize, mainConfig.Thinking.HiddenLayersCount, ref random));
-                    ecb.SetComponent(instance,
-                        CreateSeeing(mainConfig.Seeing.MinRange, mainConfig.Seeing.MaxRange, ref random));
-                    ecb.SetComponent(instance,
-                        CreateMoving(mainConfig.Movement.MinAcceleration, mainConfig.Movement.MaxAcceleration, ref random));
-                    ecb.SetComponent(instance,
-                        CreateNutritious(mainConfig.Diet.MinNutrients, mainConfig.Diet.MaxNutrients, ref random));
-                    ecb.SetComponent(instance,
-                        CreateLasting(mainConfig.Life.MinLifetime, mainConfig.Life.MaxLifetime, ref random));
-                    if (SystemAPI.HasComponent<Synthesizing>(prefab)) {
-                        ecb.SetComponent(instance,
-                            CreateSynthesizing(mainConfig.Diet.Synthesizing.MinStrength,
-                                mainConfig.Diet.Synthesizing.MaxStrength,
-                                ref random));
+                    uint fishTypeRoll = random.NextUInt(0, spawnConfig.BiterSpawnWeight + spawnConfig.PlantSpawnWeight);
+                    if (fishTypeRoll < spawnConfig.BiterSpawnWeight) {
+                        InstantiateRandomBiterFish(in fishBiterPrefabs, in mainConfig, ref random, ref ecb, ref state, botLeftCorner, topRightCorner);
                     }
-
-                    if (SystemAPI.HasComponent<Biting>(prefab)) {
-                        // Нужно рандомизировать Strength не трогая лучи
-                        var biting = SystemAPI.GetComponent<Biting>(prefab);
-                        biting.Strength =
-                            random.NextFloat(mainConfig.Diet.Biting.MinStrength, mainConfig.Diet.Biting.MaxStrength);
-                        ecb.SetComponent(instance, biting);
+                    else {
+                        InstantiateRandomPlantFish(in fishPlantPrefabs, in mainConfig, ref random, ref ecb, ref state, botLeftCorner, topRightCorner);
                     }
                 }
 
                 ecb.DestroyEntity(entity);
             }
 
-            foreach (var (request, entity) in SystemAPI.Query<RefRO<SpawnFishRequest>>().WithEntityAccess()) {
+            int fishBiterPrefabsCount = fishBiterPrefabs.Length;
+
+            foreach (var (request, entity) in SystemAPI.Query<RefRO<SpawnFishBiterRequest>>().WithEntityAccess()) {
                 for (var i = 0; i < request.ValueRO.Count; i++) {
-                    Entity prefab = fishPrefabBuffer[random.NextInt(0, fishPrefabsCount)].Value;
+                    Entity prefab = fishBiterPrefabs[random.NextInt(0, fishBiterPrefabsCount)].Value;
                     Entity instance = ecb.Instantiate(prefab);
 
                     ecb.SetComponent(instance, new LocalTransform {
@@ -107,20 +86,111 @@ namespace Spawn
                     ecb.SetComponent(instance, request.ValueRO.Moving);
                     ecb.SetComponent(instance, request.ValueRO.Nutritious);
                     ecb.SetComponent(instance, request.ValueRO.Lasting);
-                    if (SystemAPI.HasComponent<Synthesizing>(prefab)) {
-                        ecb.SetComponent(instance, request.ValueRO.Synthesizing);
-                    }
 
-                    if (SystemAPI.HasComponent<Biting>(prefab)) {
-                        // Нужно задать Strength не трогая лучи
-                        var biting = SystemAPI.GetComponent<Biting>(prefab);
-                        biting.Strength = request.ValueRO.Biting.Strength;
-                        ecb.SetComponent(instance, biting);
-                    }
+                    // Нужно задать Strength не трогая лучи
+                    var biting = SystemAPI.GetComponent<Biting>(prefab);
+                    biting.Strength = request.ValueRO.Biting.Strength;
+                    ecb.SetComponent(instance, biting);
                 }
 
                 ecb.DestroyEntity(entity);
             }
+            
+            int fishPlantPrefabsCount = fishPlantPrefabs.Length;
+            
+            foreach (var (request, entity) in SystemAPI.Query<RefRO<SpawnFishPlantRequest>>().WithEntityAccess()) {
+                for (var i = 0; i < request.ValueRO.Count; i++) {
+                    Entity prefab = fishPlantPrefabs[random.NextInt(0, fishPlantPrefabsCount)].Value;
+                    Entity instance = ecb.Instantiate(prefab);
+
+                    ecb.SetComponent(instance, new LocalTransform {
+                        Position = new float3(request.ValueRO.Position, 0),
+                        Scale = 1f,
+                        Rotation = quaternion.identity
+                    });
+
+                    ecb.SetComponent(instance, request.ValueRO.Thinking);
+                    ecb.SetComponent(instance, request.ValueRO.Seeing);
+                    ecb.SetComponent(instance, request.ValueRO.Moving);
+                    ecb.SetComponent(instance, request.ValueRO.Nutritious);
+                    ecb.SetComponent(instance, request.ValueRO.Lasting);
+
+                    ecb.SetComponent(instance, request.ValueRO.Synthesizing);
+                }
+
+                ecb.DestroyEntity(entity);
+            }
+        }
+        
+        private void InstantiateRandomBiterFish(in DynamicBuffer<FishBiterPrefabBufferElement> prefabs,
+            in MainConfig mainConfig, ref Random random, ref EntityCommandBuffer ecb, ref SystemState state, float2 botLeftCorner,
+            float2 topRightCorner)
+        {
+            int prefabCount = prefabs.Length;
+
+            Entity prefab = prefabs[random.NextInt(0, prefabCount)].Value;
+            Entity instance = ecb.Instantiate(prefab);
+
+            ecb.SetComponent(instance, CreateLocalTransformOnRandomPosition(ref random, botLeftCorner, topRightCorner));
+
+            ecb.SetComponent(instance,
+                CreateBrain(mainConfig.Thinking.HiddenLayerSize, mainConfig.Thinking.HiddenLayersCount,
+                    ref random));
+            ecb.SetComponent(instance,
+                CreateSeeing(mainConfig.Seeing.MinRange, mainConfig.Seeing.MaxRange, ref random));
+            ecb.SetComponent(instance,
+                CreateMoving(mainConfig.Movement.MinAcceleration, mainConfig.Movement.MaxAcceleration,
+                    ref random));
+            ecb.SetComponent(instance,
+                CreateNutritious(mainConfig.Diet.MinNutrients, mainConfig.Diet.MaxNutrients, ref random));
+            ecb.SetComponent(instance,
+                CreateLasting(mainConfig.Life.MinLifetime, mainConfig.Life.MaxLifetime, ref random));
+
+            // Нужно рандомизировать Strength не трогая лучи
+            var biting = SystemAPI.GetComponent<Biting>(prefab);
+            biting.Strength =
+                random.NextFloat(mainConfig.Diet.Biting.MinStrength, mainConfig.Diet.Biting.MaxStrength);
+            ecb.SetComponent(instance, biting);
+        }
+
+        private void InstantiateRandomPlantFish(in DynamicBuffer<FishPlantPrefabBufferElement> prefabs,
+            in MainConfig mainConfig, ref Random random, ref EntityCommandBuffer ecb, ref SystemState state, float2 botLeftCorner,
+            float2 topRightCorner)
+        {
+            int prefabCount = prefabs.Length;
+
+            Entity prefab = prefabs[random.NextInt(0, prefabCount)].Value;
+            Entity instance = ecb.Instantiate(prefab);
+
+            ecb.SetComponent(instance, CreateLocalTransformOnRandomPosition(ref random, botLeftCorner, topRightCorner));
+
+            ecb.SetComponent(instance,
+                CreateBrain(mainConfig.Thinking.HiddenLayerSize, mainConfig.Thinking.HiddenLayersCount,
+                    ref random));
+            ecb.SetComponent(instance,
+                CreateSeeing(mainConfig.Seeing.MinRange, mainConfig.Seeing.MaxRange, ref random));
+            ecb.SetComponent(instance,
+                CreateMoving(mainConfig.Movement.MinAcceleration, mainConfig.Movement.MaxAcceleration,
+                    ref random));
+            ecb.SetComponent(instance,
+                CreateNutritious(mainConfig.Diet.MinNutrients, mainConfig.Diet.MaxNutrients, ref random));
+            ecb.SetComponent(instance,
+                CreateLasting(mainConfig.Life.MinLifetime, mainConfig.Life.MaxLifetime, ref random));
+
+            ecb.SetComponent(instance,
+                CreateSynthesizing(mainConfig.Diet.Synthesizing.MinStrength,
+                    mainConfig.Diet.Synthesizing.MaxStrength,
+                    ref random));
+        }
+
+        private LocalTransform CreateLocalTransformOnRandomPosition(ref Random random, float2 botLeftCorner,
+            float2 topRightCorner)
+        {
+            return new LocalTransform {
+                Position = new float3(random.NextFloat2(botLeftCorner, topRightCorner), 0),
+                Scale = 1f,
+                Rotation = quaternion.identity
+            };
         }
 
         private Thinking CreateBrain(ushort hiddenLayersSize, ushort hiddenLayersCount, ref Random random)

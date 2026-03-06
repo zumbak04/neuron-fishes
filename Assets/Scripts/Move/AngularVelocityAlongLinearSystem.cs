@@ -9,8 +9,9 @@ using Unity.Transforms;
 
 namespace Move
 {
-    [BurstCompile, UpdateInGroup(typeof(AfterPhysicsSystemGroup)), UpdateAfter(typeof(MovementSystem))]
-    public partial struct MovementRotationSystem : ISystem
+    // todo zumbak поворачивать рыб на цель чтобы они не терлись боками друг от друга до смерти
+    [BurstCompile, UpdateInGroup(typeof(BeforePhysicsSystemGroup))]
+    public partial struct AngularVelocityAlongLinearSystem : ISystem
     {
         private const float LINEAR_SPEED_EPSILON_SQ = 0.1f;
             
@@ -29,16 +30,16 @@ namespace Move
         {
             var config = SystemAPI.GetSingleton<MainConfig>();
             
-            RotateTowardsLinearVelocityJob rotateTowardsLinearVelocityJob = new() {
+            CalculateAngularVelocityJob calculateAngularVelocityJob = new() {
                 Smoothness = config.Movement.RotationSmoothness,
                 MaxAngularVelocity = config.Movement.MaxAngularSpeed
             };
 
-            state.Dependency = rotateTowardsLinearVelocityJob.ScheduleParallel(state.Dependency);
+            state.Dependency = calculateAngularVelocityJob.ScheduleParallel(state.Dependency);
         }
 
         [BurstCompile, WithAll(typeof(Moving))]
-        private partial struct RotateTowardsLinearVelocityJob : IJobEntity
+        private partial struct CalculateAngularVelocityJob : IJobEntity
         {
             public float Smoothness;
             public float MaxAngularVelocity;

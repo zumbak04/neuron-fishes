@@ -12,5 +12,7 @@ namespace Config
 
         [field: SerializeField]
         public float MaxStrength { get; private set; }
+
+        [field: SerializeField] public float Cooldown { get; private set; }
     }
 }

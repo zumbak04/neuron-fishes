@@ -2,6 +2,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using UnityEngine;
 
 namespace Sight
@@ -14,12 +15,12 @@ namespace Sight
             {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent<Seeing>(entity);
-                AddComponent(entity, new SightOutputEvent {
-                    Outputs = new FixedList32Bytes<float2> {
+                AddComponent(entity, new SeenEvent {
+                    ToTargets = new FixedList32Bytes<float2> {
                         Length = ThinkingConsts.INPUT_SIZE
                     }
                 });
-                SetComponentEnabled<SightOutputEvent>(entity, false);
+                SetComponentEnabled<SeenEvent>(entity, false);
             }
         }
     }
@@ -30,10 +31,9 @@ namespace Sight
         public float Range;
     }
 
-    public struct SightOutputEvent : IComponentData, IEnableableComponent
+    public struct SeenEvent : IComponentData, IEnableableComponent
     {
-        // todo zumbak передавать нормализованный вектор. Это должно убрать кружение вокруг цели.
         // 7 элементов, 8 битов на каждый float2 + 4 бита на header
-        public FixedList64Bytes<float2> Outputs;
+        public FixedList64Bytes<float2> ToTargets;
     }
 }

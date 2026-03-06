@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 743023119}
   - component: {fileID: 743023120}
   - component: {fileID: 743023121}
+  - component: {fileID: 743023122}
   m_Layer: 0
   m_Name: MainConfig
   m_TagString: Untagged
@@ -164,55 +165,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 533596a9bbb24f47baa912f9e7a7dd33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <FishPrefabs>k__BackingField:
-  - {fileID: 4871536276139427349, guid: 205ab97900e83294ab28fce01cbe7d7a, type: 3}
-  - {fileID: 4871536276139427349, guid: fd549f7e064fe35459e10372e6ef441d, type: 3}
-  - {fileID: 4871536276139427349, guid: 9eb0f3058ade8bd429c5bac56da0aeee, type: 3}
-  - {fileID: 4871536276139427349, guid: 451c5c23499cdec43897e14dfedb7972, type: 3}
-  - {fileID: 4871536276139427349, guid: 2f1a73267c54f8d4dad0d58c12b4454a, type: 3}
-  - {fileID: 4871536276139427349, guid: bc2aeb3333f2d19429db58c8d3dd1daf, type: 3}
-  - {fileID: 4871536276139427349, guid: 890b64ac8269e8540818eb36b5991eab, type: 3}
-  - {fileID: 4871536276139427349, guid: c3a56052dac6ea74cb93acfdeefd488c, type: 3}
-  - {fileID: 4871536276139427349, guid: 7b254d07bb708fd4abf5468123fcc606, type: 3}
-  - {fileID: 4871536276139427349, guid: e6586fda1af137a49924dea1a989e055, type: 3}
-  - {fileID: 4871536276139427349, guid: 13ef94acd060a024a87b5b535ad8bafc, type: 3}
-  - {fileID: 4871536276139427349, guid: 674585b75a8951842bf2e821b0746b1e, type: 3}
-  - {fileID: 4871536276139427349, guid: 9eeed6cfdd271e248886eb2ea390e547, type: 3}
-  - {fileID: 4871536276139427349, guid: 9b93f8b941f3a1941b87a67e5f6ed094, type: 3}
-  - {fileID: 4871536276139427349, guid: 201dbdc7264ef164bbde0cbfe53bafe1, type: 3}
-  - {fileID: 4871536276139427349, guid: 8f55e350f9b948a43990d071c7c27d9b, type: 3}
-  - {fileID: 4871536276139427349, guid: 110afb269c770e3419b382f848cd37b5, type: 3}
-  - {fileID: 4871536276139427349, guid: 51a0186e4ab2215499774b886f792819, type: 3}
-  - {fileID: 4871536276139427349, guid: 49fbc0ea153f99941815585d00f17c24, type: 3}
-  - {fileID: 4871536276139427349, guid: 54e834a38bd088c4c85cea953d0003f0, type: 3}
-  - {fileID: 4871536276139427349, guid: c6122dbed50523545983603c3ee745b6, type: 3}
-  - {fileID: 4871536276139427349, guid: 7ac16d50da259124ab09fb2c167dd302, type: 3}
-  - {fileID: 4871536276139427349, guid: 151d69854569a3f49abac70c2af90ae8, type: 3}
-  - {fileID: 4871536276139427349, guid: eb60c8d7223fe754fb2dbc6053357333, type: 3}
   <Thinking>k__BackingField:
     <HiddenLayerSize>k__BackingField: 4
     <HiddenLayersCount>k__BackingField: 8
   <Seeing>k__BackingField:
-    <Cooldown>k__BackingField: 0.5
+    <Cooldown>k__BackingField: 0.2
     <MinRange>k__BackingField: 10
     <MaxRange>k__BackingField: 20
   <Movement>k__BackingField:
-    <MinAcceleration>k__BackingField: 1
-    <MaxAcceleration>k__BackingField: 3
-    <MaxSpeed>k__BackingField: 10
-    <MinDrag>k__BackingField: 0.35
+    <MinAcceleration>k__BackingField: 3
+    <MaxAcceleration>k__BackingField: 9
+    <MaxSpeed>k__BackingField: 20
+    <MinDamping>k__BackingField: 0.35
     <RotationSmoothness>k__BackingField: 3
     <MaxAngularSpeed>k__BackingField: 6.28
   <Diet>k__BackingField:
     <MinNutrients>k__BackingField: 60
     <MaxNutrients>k__BackingField: 300
-    <NutrientLossPerSecond>k__BackingField: 1
+    <NutrientDecayPerSecond>k__BackingField: 1
     <Synthesizing>k__BackingField:
       <MinStrength>k__BackingField: 0.5
       <MaxStrength>k__BackingField: 2
     <Biting>k__BackingField:
       <MinStrength>k__BackingField: 10
       <MaxStrength>k__BackingField: 100
+      <Cooldown>k__BackingField: 2
   <Life>k__BackingField:
     <MinLifetime>k__BackingField: 60
     <MaxLifetime>k__BackingField: 300
@@ -243,6 +220,46 @@ MonoBehaviour:
   <NorthWestBoundCornerPrefab>k__BackingField: {fileID: 4068173828558984108, guid: 418095d8fd21bd34e8da9c82e0ff3e0a, type: 3}
   <SouthEastBoundCornerPrefab>k__BackingField: {fileID: 4068173828558984108, guid: 521e6b4b607960f46bfdf65f70549eeb, type: 3}
   <SouthWestBoundCornerPrefab>k__BackingField: {fileID: 4068173828558984108, guid: 64c976c4d2d49554b8e40bfeb3569e55, type: 3}
+--- !u!114 &743023122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743023118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6002c50c9eba42a9ad8a5e7a3ac9fca7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BiterPrefabs:
+  - {fileID: 4871536276139427349, guid: 205ab97900e83294ab28fce01cbe7d7a, type: 3}
+  - {fileID: 4871536276139427349, guid: fd549f7e064fe35459e10372e6ef441d, type: 3}
+  - {fileID: 4871536276139427349, guid: 9eb0f3058ade8bd429c5bac56da0aeee, type: 3}
+  - {fileID: 4871536276139427349, guid: 451c5c23499cdec43897e14dfedb7972, type: 3}
+  - {fileID: 4871536276139427349, guid: 2f1a73267c54f8d4dad0d58c12b4454a, type: 3}
+  - {fileID: 4871536276139427349, guid: bc2aeb3333f2d19429db58c8d3dd1daf, type: 3}
+  - {fileID: 4871536276139427349, guid: 890b64ac8269e8540818eb36b5991eab, type: 3}
+  - {fileID: 4871536276139427349, guid: c3a56052dac6ea74cb93acfdeefd488c, type: 3}
+  - {fileID: 4871536276139427349, guid: 7b254d07bb708fd4abf5468123fcc606, type: 3}
+  - {fileID: 4871536276139427349, guid: e6586fda1af137a49924dea1a989e055, type: 3}
+  - {fileID: 4871536276139427349, guid: 13ef94acd060a024a87b5b535ad8bafc, type: 3}
+  - {fileID: 4871536276139427349, guid: 674585b75a8951842bf2e821b0746b1e, type: 3}
+  - {fileID: 4871536276139427349, guid: 9eeed6cfdd271e248886eb2ea390e547, type: 3}
+  - {fileID: 4871536276139427349, guid: 9b93f8b941f3a1941b87a67e5f6ed094, type: 3}
+  - {fileID: 4871536276139427349, guid: 201dbdc7264ef164bbde0cbfe53bafe1, type: 3}
+  - {fileID: 4871536276139427349, guid: 8f55e350f9b948a43990d071c7c27d9b, type: 3}
+  - {fileID: 4871536276139427349, guid: 110afb269c770e3419b382f848cd37b5, type: 3}
+  PlantPrefabs:
+  - {fileID: 4871536276139427349, guid: 51a0186e4ab2215499774b886f792819, type: 3}
+  - {fileID: 4871536276139427349, guid: 49fbc0ea153f99941815585d00f17c24, type: 3}
+  - {fileID: 4871536276139427349, guid: 54e834a38bd088c4c85cea953d0003f0, type: 3}
+  - {fileID: 4871536276139427349, guid: c6122dbed50523545983603c3ee745b6, type: 3}
+  - {fileID: 4871536276139427349, guid: 7ac16d50da259124ab09fb2c167dd302, type: 3}
+  - {fileID: 4871536276139427349, guid: 151d69854569a3f49abac70c2af90ae8, type: 3}
+  - {fileID: 4871536276139427349, guid: eb60c8d7223fe754fb2dbc6053357333, type: 3}
+  <BiterSpawnWeight>k__BackingField: 3
+  <PlantSpawnWeight>k__BackingField: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

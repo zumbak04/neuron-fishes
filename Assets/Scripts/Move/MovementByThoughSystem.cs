@@ -3,12 +3,11 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics;
-using Unity.Physics.Systems;
 
 namespace Move
 {
-    [BurstCompile, UpdateInGroup(typeof(AfterPhysicsSystemGroup))]
-    public partial struct MovementSystem : ISystem
+    [BurstCompile, UpdateAfter(typeof(ThinkingSystem))]
+    public partial struct MovementByThoughSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
@@ -21,15 +20,15 @@ namespace Move
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            MoveByThoughJob moveByThoughJob = new() {
+            CalculateVelocityByThoughJob calculateVelocityByThoughJob = new() {
                 DeltaTime = SystemAPI.Time.DeltaTime
             };
             
-            state.Dependency = moveByThoughJob.ScheduleParallel(state.Dependency);
+            state.Dependency = calculateVelocityByThoughJob.ScheduleParallel(state.Dependency);
         }
         
         [BurstCompile]
-        private partial struct MoveByThoughJob : IJobEntity
+        private partial struct CalculateVelocityByThoughJob : IJobEntity
         {
             public float DeltaTime;
             

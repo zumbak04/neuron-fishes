@@ -11,6 +11,8 @@ namespace Diet
             {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent<Nutritious>(entity);
+                AddComponent<BittenEvent>(entity);
+                SetComponentEnabled<BittenEvent>(entity, false);
             }
         }
     }
@@ -19,5 +21,10 @@ namespace Diet
     {
         public float Current;
         public float Limit;
+    }
+
+    public struct BittenEvent : IComponentData, IEnableableComponent
+    {
+        public float NutrientLoss;
     }
 }

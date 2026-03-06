@@ -13,17 +13,25 @@ namespace Spawn
             _ecbSystem = ecbSystem;
         }
 
-        public void SpawnRandomFishes(ushort count)
+        public void SpawnFishes(ushort count)
         {
             EntityCommandBuffer ecb = _ecbSystem.CreateCommandBuffer();
 
             Entity entity = ecb.CreateEntity();
-            ecb.AddComponent(entity, new SpawnRandomFishRequest {
+            ecb.AddComponent(entity, new SpawnFishesRequest {
                 Count = count
             });
         }
 
-        public void SpawnFish(SpawnFishRequest request)
+        public void SpawnBiterFish(in SpawnFishBiterRequest request)
+        {
+            EntityCommandBuffer ecb = _ecbSystem.CreateCommandBuffer();
+
+            Entity entity = ecb.CreateEntity();
+            ecb.AddComponent(entity, request);
+        }
+        
+        public void SpawnPlantFish(in SpawnFishPlantRequest request)
         {
             EntityCommandBuffer ecb = _ecbSystem.CreateCommandBuffer();
 

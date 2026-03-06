@@ -14,7 +14,7 @@ namespace Config
         public float MaxNutrients { get; private set; }
 
         [field: SerializeField]
-        public float NutrientLossPerSecond { get; private set; }
+        public float NutrientDecayPerSecond { get; private set; }
 
         [field: SerializeField]
         public DietSynthesizingConfig Synthesizing { get; private set; }

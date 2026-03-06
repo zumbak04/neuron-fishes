@@ -5,7 +5,7 @@ using Unity.Entities;
 namespace Diet
 {
     [BurstCompile]
-    public partial struct NutrientLossSystem : ISystem
+    public partial struct NutrientDecaySystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
@@ -19,9 +19,9 @@ namespace Diet
         {
             var config = SystemAPI.GetSingleton<MainConfig>();
 
-            // Synthesizing по дефолту не теряют nutrients
+            // Synthesizing не теряют nutrients
             foreach (var nutritious in SystemAPI.Query<RefRW<Nutritious>>().WithNone<Synthesizing>()) {
-                nutritious.ValueRW.Current -= config.Diet.NutrientLossPerSecond * SystemAPI.Time.DeltaTime;
+                nutritious.ValueRW.Current -= config.Diet.NutrientDecayPerSecond * SystemAPI.Time.DeltaTime;
             }
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Spawn
 {
-    public struct SpawnRandomFishRequest : IComponentData
+    public struct SpawnFishesRequest : IComponentData
     {
         public ushort Count;
     }
