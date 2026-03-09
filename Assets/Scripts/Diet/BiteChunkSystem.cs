@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Config;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -12,129 +12,152 @@ using RaycastHit = Unity.Physics.RaycastHit;
 
 namespace Diet
 {
-    /// <remarks>
-    /// Система без компонентов-событий.
-    /// Значительной производительности не дала, а код в разы сложнее. Отложил на будущее.
-    /// </remarks>
-    [BurstCompile, UpdateAfter(typeof(TransformSystemGroup)), Obsolete]
+    [BurstCompile, UpdateAfter(typeof(TransformSystemGroup)), UpdateAfter(typeof(BiteCooldownSystem))]
     public partial struct BiteChunkSystem : ISystem
     {
-        private EntityQuery _nutritiousBitingQuery;
+        private EntityQuery _biterQuery;
 
+        private EntityTypeHandle _entityHandle;
         private ComponentTypeHandle<Biting> _bitingHandle;
         private ComponentTypeHandle<LocalToWorld> _ltwHandle;
-        private EntityTypeHandle _entityHandle;
-        private ComponentLookup<Nutritious> _nutritiousLookup;
+        private ComponentTypeHandle<TookBiteEvent> _tookBiteEventHandle;
+        private ComponentTypeHandle<BitingCooldown> _bitingCooldownHandle;
+
+        private ComponentLookup<BittenEvent> _bittenEventLookup;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.Enabled = false;
-            
-            _nutritiousBitingQuery =
-                new EntityQueryBuilder(Allocator.Temp).WithAll<Nutritious, Biting>().Build(ref state);
+            _biterQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<LocalToWorld, Biting>()
+                .WithDisabled<TookBiteEvent, BitingCooldown>().Build(ref state);
 
             state.RequireForUpdate<PhysicsWorldSingleton>();
-            state.RequireForUpdate(_nutritiousBitingQuery);
+            state.RequireForUpdate(_biterQuery);
+            state.RequireForUpdate<BittenEvent>();
+            state.RequireForUpdate<MainConfig>();
 
+            _entityHandle = state.GetEntityTypeHandle();
             _bitingHandle = state.GetComponentTypeHandle<Biting>(true);
             _ltwHandle = state.GetComponentTypeHandle<LocalToWorld>(true);
-            _entityHandle = state.GetEntityTypeHandle();
-            _nutritiousLookup = state.GetComponentLookup<Nutritious>();
-        }
+            _tookBiteEventHandle = state.GetComponentTypeHandle<TookBiteEvent>();
+            _bitingCooldownHandle = state.GetComponentTypeHandle<BitingCooldown>();
 
-        [BurstCompile]
-        public void OnDestroy(ref SystemState state)
-        {
-            _nutritiousBitingQuery.Dispose();
+            _bittenEventLookup = state.GetComponentLookup<BittenEvent>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            int chunkCount = _nutritiousBitingQuery.CalculateChunkCount();
-            if (chunkCount == 0) {
-                return;
-            }
-
+            var mainConfig = SystemAPI.GetSingleton<MainConfig>();
             var collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
 
+            _entityHandle.Update(ref state);
             _bitingHandle.Update(ref state);
             _ltwHandle.Update(ref state);
-            _entityHandle.Update(ref state);
-            _nutritiousLookup.Update(ref state);
-            
-            NativeStream eventStream = new(chunkCount, Allocator.TempJob);
+            _tookBiteEventHandle.Update(ref state);
+            _bitingCooldownHandle.Update(ref state);
+            _bittenEventLookup.Update(ref state);
 
-            RegisterBiteEventJob registerBiteEventJob = new() {
+            int biterCount = _biterQuery.CalculateEntityCount();
+            NativeParallelMultiHashMap<Entity, float> bittenLossMap = new(biterCount * 2, Allocator.TempJob);
+
+            TryTakeBiteJob tryTakeBiteJob = new() {
                 EntityHandle = _entityHandle,
                 BitingHandle = _bitingHandle,
-                CollisionWorld = collisionWorld,
-                DeltaTime = SystemAPI.Time.DeltaTime,
                 LtwHandle = _ltwHandle,
-                StreamWriter = eventStream.AsWriter()
+                CollisionFilter = new CollisionFilter {
+                    BelongsTo = LayerConsts.FISH_MOUTH,
+                    // Все сущности на слое обязаны иметь BittenEvent компонент чтобы не проверять через Lookup
+                    CollidesWith = LayerConsts.FISH_BODY,
+                    GroupIndex = 0
+                },
+                CollisionWorld = collisionWorld,
+                Cooldown = mainConfig.Diet.Biting.Cooldown,
+                BittenLossWriter = bittenLossMap.AsParallelWriter(),
+                TookBiteEventHandle = _tookBiteEventHandle,
+                BitingCooldownHandle = _bitingCooldownHandle
             };
-            state.Dependency = registerBiteEventJob.ScheduleParallel(_nutritiousBitingQuery, state.Dependency);
-
-            ApplyBiteEventJob applyBiteEventJob = new() {
-                StreamReader = eventStream.AsReader(),
-                NutritiousLookup = _nutritiousLookup
+            tryTakeBiteJob.ScheduleParallel(_biterQuery, state.Dependency).Complete();
+            
+            (NativeArray<Entity> uniqueBittens, int _) = bittenLossMap.GetUniqueKeyArray(Allocator.TempJob);
+            SetBittenEventsJob setBittenEventsJob = new() {
+                BittenLossMap = bittenLossMap.AsReadOnly(),
+                UniqueBittens = uniqueBittens.AsReadOnly(),
+                BittenEventLookup = _bittenEventLookup
             };
-            state.Dependency = applyBiteEventJob.Schedule(chunkCount, 64, state.Dependency);
-
-            state.Dependency = eventStream.Dispose(state.Dependency);
+            state.Dependency = setBittenEventsJob.Schedule(state.Dependency);
+            
+            state.Dependency = uniqueBittens.Dispose(state.Dependency);
+            state.Dependency = bittenLossMap.Dispose(state.Dependency);
         }
 
         [BurstCompile]
-        private struct RegisterBiteEventJob : IJobChunk
+        private struct TryTakeBiteJob : IJobChunk
         {
             [ReadOnly] public EntityTypeHandle EntityHandle;
             [ReadOnly] public ComponentTypeHandle<Biting> BitingHandle;
             [ReadOnly] public ComponentTypeHandle<LocalToWorld> LtwHandle;
+            [ReadOnly] public CollisionFilter CollisionFilter;
             [ReadOnly] public CollisionWorld CollisionWorld;
-            public float DeltaTime;
-            public NativeStream.Writer StreamWriter;
+            public float Cooldown;
+            public NativeParallelMultiHashMap<Entity, float>.ParallelWriter BittenLossWriter;
+            public ComponentTypeHandle<TookBiteEvent> TookBiteEventHandle;
+            public ComponentTypeHandle<BitingCooldown> BitingCooldownHandle;
 
             public unsafe void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask,
                 in v128 chunkEnabledMask)
             {
+                // todo zumbak можно добавить staggering
+
                 NativeArray<Entity> entities = chunk.GetNativeArray(EntityHandle);
                 var pBitings = (Biting*)chunk.GetNativeArray(ref BitingHandle).GetUnsafeReadOnlyPtr();
                 var pLtws = (LocalToWorld*)chunk.GetNativeArray(ref LtwHandle).GetUnsafeReadOnlyPtr();
+                NativeArray<TookBiteEvent> tookBiteEvents = chunk.GetNativeArray(ref TookBiteEventHandle);
+                NativeArray<BitingCooldown> bitingCooldowns = chunk.GetNativeArray(ref BitingCooldownHandle);
+                EnabledMask tookBiteEventEnabledMask = chunk.GetEnabledMask(ref TookBiteEventHandle);
+                EnabledMask bitingCooldownEnabledMask = chunk.GetEnabledMask(ref BitingCooldownHandle);
 
-                StreamWriter.BeginForEachIndex(unfilteredChunkIndex);
-                for (var i = 0; i < chunk.Count; i++) {
-                    if (CastAllRays(in pBitings[i].Rays, in pLtws[i], out RaycastHit firstClosestHit)) {
-                        StreamWriter.Write(new BiteEvent() {
-                            Biter = entities[i],
-                            Target = firstClosestHit.Entity,
-                            Damage = pBitings[i].Strength * DeltaTime
-                        });
+                ChunkEntityEnumerator entityEnumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+
+                while (entityEnumerator.NextEntityIndex(out int i)) {
+                    if (!CastAllRays(entities[i], in pBitings[i].Rays, in pLtws[i], out RaycastHit firstClosestHit)) {
+                        return;
                     }
-                }
 
-                StreamWriter.EndForEachIndex();
+                    float nutrientDelta = pBitings[i].Strength;
+
+                    tookBiteEvents[i] = new TookBiteEvent {
+                        NutrientGain = nutrientDelta
+                    };
+                    tookBiteEventEnabledMask[i] = true;
+
+                    bitingCooldowns[i] = new BitingCooldown {
+                        Value = Cooldown,
+                    };
+                    bitingCooldownEnabledMask[i] = true;
+
+                    BittenLossWriter.Add(firstClosestHit.Entity, nutrientDelta);
+                }
             }
-            
-            private bool CastAllRays(in FixedList64Bytes<BitingRay> rays, in LocalToWorld ltw,
+
+            private bool CastAllRays(Entity biterEntity, in FixedList64Bytes<BitingRay> rays, in LocalToWorld ltw,
                 out RaycastHit firstClosestHit)
             {
+                RaycastInput input = new() {
+                    Filter = CollisionFilter
+                };
+                firstClosestHit = new RaycastHit();
                 for (var i = 0; i < rays.Length; i++) {
-                    RaycastInput input = new() {
-                        Start = ltw.Position + ltw.Right * rays[i].Start.x + ltw.Up * rays[i].Start.y,
-                        End = ltw.Position + ltw.Right * rays[i].End.x + ltw.Up * rays[i].End.y,
-                        Filter = new CollisionFilter {
-                            BelongsTo = LayerConsts.FISH_MOUTH,
-                            // Все сущности на слое обязаны иметь Nutritious компонент
-                            CollidesWith = LayerConsts.FISH_BODY,
-                            GroupIndex = 0
-                        }
-                    };
-                    if (!CollisionWorld.CastRay(input, out RaycastHit closestHit)) {
+                    input.Start = ltw.Position + ltw.Right * rays[i].Start.x + ltw.Up * rays[i].Start.y;
+                    input.End = ltw.Position + ltw.Right * rays[i].End.x + ltw.Up * rays[i].End.y;
+                    if (!CollisionWorld.CastRay(input, out firstClosestHit)) {
                         continue;
                     }
 
-                    firstClosestHit = closestHit;
+                    if (biterEntity == firstClosestHit.Entity) {
+                        continue;
+                    }
+
                     return true;
                 }
 
@@ -144,44 +167,32 @@ namespace Diet
         }
 
         [BurstCompile]
-        private struct ApplyBiteEventJob : IJobParallelFor
+        private struct SetBittenEventsJob : IJob
         {
-            [ReadOnly] 
-            public NativeStream.Reader StreamReader;
-            [NativeDisableParallelForRestriction]
-            public ComponentLookup<Nutritious> NutritiousLookup;
+            [ReadOnly] public NativeParallelMultiHashMap<Entity, float>.ReadOnly BittenLossMap;
+            [ReadOnly] public NativeArray<Entity>.ReadOnly UniqueBittens;
+            public ComponentLookup<BittenEvent> BittenEventLookup;
 
-            public void Execute(int index)
+            public void Execute()
             {
-                int count = StreamReader.BeginForEachIndex(index);
-
-                for (int i = 0; i < count; i++) {
-                    BiteEvent evt = StreamReader.Read<BiteEvent>();
-
-                    if (!NutritiousLookup.TryGetComponent(evt.Target, out Nutritious targetNutritious)) {
+                foreach (Entity bitten in UniqueBittens) {
+                    // Складываем все потери и записываем в BittenEvent. Минимизируем random access через Lookup.
+                    float lossSum = 0;
+                    if (!BittenLossMap.TryGetFirstValue(bitten, out float loss,
+                            out NativeParallelMultiHashMapIterator<Entity> it)) {
                         continue;
                     }
 
-                    targetNutritious.Current -= evt.Damage;
-                    NutritiousLookup[evt.Target] = targetNutritious;
+                    do {
+                        lossSum += loss;
+                    } while (BittenLossMap.TryGetNextValue(out loss, ref it));
 
-                    if (!NutritiousLookup.TryGetComponent(evt.Biter, out Nutritious biterNutritious)) {
-                        continue;
-                    }
-
-                    biterNutritious.Current += evt.Damage;
-                    NutritiousLookup[evt.Biter] = biterNutritious;
+                    BittenEventLookup[bitten] = new BittenEvent {
+                        NutrientLoss = lossSum
+                    };
+                    BittenEventLookup.SetComponentEnabled(bitten, true);
                 }
-
-                StreamReader.EndForEachIndex();
             }
-        }
-
-        private struct BiteEvent
-        {
-            public Entity Biter;
-            public Entity Target;
-            public float Damage;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Config;
+﻿using System;
+using Config;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -10,7 +11,7 @@ using RaycastHit = Unity.Physics.RaycastHit;
 
 namespace Diet
 {
-    [BurstCompile, UpdateAfter(typeof(TransformSystemGroup)), UpdateAfter(typeof(BiteCooldownSystem))]
+    [BurstCompile, UpdateAfter(typeof(TransformSystemGroup)), UpdateAfter(typeof(BiteCooldownSystem)), Obsolete]
     public partial struct BiteEntitySystem : ISystem
     {
         private ComponentLookup<BittenEvent> _bittenEventLookup;
@@ -18,6 +19,8 @@ namespace Diet
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
+            state.Enabled = false;
+            
             EntityQuery biterQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<LocalToWorld, Biting>()
                 .WithDisabled<TookBiteEvent, BitingCooldown>().Build(ref state);
 
@@ -70,7 +73,7 @@ namespace Diet
             public NativeQueue<BittenData>.ParallelWriter BittenWriter;
             public float Cooldown;
 
-            private void Execute(Entity entity, in LocalToWorld ltw, ref Biting biting, ref TookBiteEvent tookBiteEvent,
+            private void Execute(Entity entity, in LocalToWorld ltw, in Biting biting, ref TookBiteEvent tookBiteEvent,
                 ref BitingCooldown bitingCooldown, EnabledRefRW<TookBiteEvent> tookBiteEventEnabled,
                 EnabledRefRW<BitingCooldown> bitingCooldownEnabled)
             {

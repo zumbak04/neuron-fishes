@@ -78,7 +78,7 @@ namespace Sight
             state.Dependency = new TrySeeSpatialTargetsJob {
                 Cooldown = config.Seeing.Cooldown,
                 CellSize = cellSize,
-                Hash = _spatialHash
+                SpatialHash = _spatialHash.AsReadOnly()
             }.ScheduleParallel(buildHashJobHandle);
         }
 
@@ -106,8 +106,7 @@ namespace Sight
         {
             public float Cooldown;
             public float CellSize;
-            // todo zumbak хорошая ли идея копировать целую hash map?
-            [ReadOnly] public NativeParallelMultiHashMap<int, SpatialHashItem> Hash;
+            [ReadOnly] public NativeParallelMultiHashMap<int, SpatialHashItem>.ReadOnly SpatialHash;
 
             // todo zumbak нужно уменшить Cognitive Complexity
             private void Execute(Entity entity,
@@ -136,8 +135,8 @@ namespace Sight
                     int2 cell = selfCell + new int2(dx, dy);
                     var key = (int)math.hash(cell);
 
-                    if (!Hash.TryGetFirstValue(key, out SpatialHashItem hashItem,
-                            out NativeParallelMultiHashMapIterator<int> iterator)) {
+                    if (!SpatialHash.TryGetFirstValue(key, out SpatialHashItem hashItem,
+                            out NativeParallelMultiHashMapIterator<int> it)) {
                         continue;
                     }
 
@@ -154,7 +153,7 @@ namespace Sight
                         }
 
                         fishTarget.TryUpdateNearest(to, distanceSq);
-                    } while (Hash.TryGetNextValue(out hashItem, ref iterator));
+                    } while (SpatialHash.TryGetNextValue(out hashItem, ref it));
                 }
 
                 seenEvent.ToTargets.Length = ThinkingConsts.INPUT_SIZE;
