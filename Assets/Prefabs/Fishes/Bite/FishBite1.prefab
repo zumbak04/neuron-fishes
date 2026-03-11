@@ -147,8 +147,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Rays:
   - <Start>k__BackingField: {x: 0, y: 0.935}
-    <Direction>k__BackingField: {x: 0, y: 0.25}
+    <Direction>k__BackingField: {x: 0, y: 0.5}
   - <Start>k__BackingField: {x: 0, y: 0.935}
-    <Direction>k__BackingField: {x: 0.25, y: 0}
+    <Direction>k__BackingField: {x: 0.48, y: 0.15}
   - <Start>k__BackingField: {x: 0, y: 0.935}
-    <Direction>k__BackingField: {x: -0.25, y: 0}
+    <Direction>k__BackingField: {x: -0.48, y: 0.15}

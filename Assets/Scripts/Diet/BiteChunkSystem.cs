@@ -109,11 +109,13 @@ namespace Diet
             {
                 // todo zumbak можно добавить staggering
 
+                var pBitings = (Biting*)chunk.GetRequiredComponentDataPtrRO(ref BitingHandle);
+                var pLtws = (LocalToWorld*)chunk.GetRequiredComponentDataPtrRO(ref LtwHandle);
+                
                 NativeArray<Entity> entities = chunk.GetNativeArray(EntityHandle);
-                var pBitings = (Biting*)chunk.GetNativeArray(ref BitingHandle).GetUnsafeReadOnlyPtr();
-                var pLtws = (LocalToWorld*)chunk.GetNativeArray(ref LtwHandle).GetUnsafeReadOnlyPtr();
                 NativeArray<TookBiteEvent> tookBiteEvents = chunk.GetNativeArray(ref TookBiteEventHandle);
                 NativeArray<BitingCooldown> bitingCooldowns = chunk.GetNativeArray(ref BitingCooldownHandle);
+                
                 EnabledMask tookBiteEventEnabledMask = chunk.GetEnabledMask(ref TookBiteEventHandle);
                 EnabledMask bitingCooldownEnabledMask = chunk.GetEnabledMask(ref BitingCooldownHandle);
 

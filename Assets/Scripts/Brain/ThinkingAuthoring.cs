@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Math;
 using Unity.Collections;
 using Unity.Entities;
@@ -14,11 +15,7 @@ namespace Brain
             {
                 Entity entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent<Thinking>(entity);
-                AddComponent(entity, new ThoughOutput {
-                    Values = {
-                        Length = ThinkingConsts.OUTPUT_SIZE
-                    }
-                });
+                AddComponent<ThoughOutput>(entity);
             }
         }
     }
@@ -49,7 +46,8 @@ namespace Brain
             Weights.Length = currentOffset;
         }
 
-        public readonly Snorm8 GetWeight(ushort layer, ushort outputNode, ushort inputNode)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly Snorm8 GetWeight(int layer, int outputNode, int inputNode)
         {
             int index = _layerOffsets[layer] + outputNode * LayerSizes[layer] + inputNode;
             return Weights[index];
@@ -58,18 +56,6 @@ namespace Brain
 
     public struct ThoughOutput : IComponentData
     {
-        // 7 элементов, 8 битов на каждый float2 + 4 бита на header
-        public FixedList64Bytes<float2> Values;
-
-        public float2 AverageValue {
-            get {
-                float2 sum = float2.zero;
-                foreach (float2 value in Values) {
-                    sum += value;
-                }
-
-                return sum / Values.Length;
-            }
-        }
+        public float2 Direction;
     }
 }

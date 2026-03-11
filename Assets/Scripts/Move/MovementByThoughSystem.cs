@@ -6,7 +6,7 @@ using Unity.Physics;
 
 namespace Move
 {
-    [BurstCompile, UpdateAfter(typeof(ThinkingSystem))]
+    [BurstCompile, UpdateAfter(typeof(ThinkingEntitySystem))]
     public partial struct MovementByThoughSystem : ISystem
     {
         [BurstCompile]
@@ -34,7 +34,7 @@ namespace Move
             
             private void Execute(ref PhysicsVelocity velocity, in Moving moving, in ThoughOutput thoughOutput)
             {
-                velocity.Linear.xy += thoughOutput.AverageValue * moving.Acceleration * DeltaTime;
+                velocity.Linear.xy += thoughOutput.Direction * moving.Acceleration * DeltaTime;
             }
         }
     }

@@ -209,7 +209,7 @@ namespace Spawn
 
             for (var i = 0; i < thinking.Weights.Length; i++) {
                 thinking.Weights[i] =
-                    (Snorm8)random.NextFloat(ThinkingConsts.MIN_NODE_WEIGHT, ThinkingConsts.MAX_NODE_WEIGHT);
+                    (Snorm8) random.NextFloat(ThinkingConsts.MIN_NODE_WEIGHT, ThinkingConsts.MAX_NODE_WEIGHT);
             }
 
             return thinking;

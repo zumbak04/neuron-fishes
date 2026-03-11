@@ -173,11 +173,11 @@ MonoBehaviour:
     <MinRange>k__BackingField: 10
     <MaxRange>k__BackingField: 20
   <Movement>k__BackingField:
-    <MinAcceleration>k__BackingField: 3
-    <MaxAcceleration>k__BackingField: 9
+    <MinAcceleration>k__BackingField: 2
+    <MaxAcceleration>k__BackingField: 6
     <MaxSpeed>k__BackingField: 20
     <MinDamping>k__BackingField: 0.35
-    <RotationSmoothness>k__BackingField: 3
+    <RotationSmoothness>k__BackingField: 5
     <MaxAngularSpeed>k__BackingField: 6.28
   <Diet>k__BackingField:
     <MinNutrients>k__BackingField: 60
