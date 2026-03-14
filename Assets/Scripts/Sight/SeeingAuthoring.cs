@@ -2,7 +2,6 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Physics;
 using UnityEngine;
 
 namespace Sight
@@ -27,7 +26,6 @@ namespace Sight
 
     public struct Seeing : IComponentData
     {
-        public float Cooldown;
         public float Range;
     }
 

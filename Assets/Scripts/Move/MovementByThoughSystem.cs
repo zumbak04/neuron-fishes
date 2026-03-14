@@ -6,7 +6,7 @@ using Unity.Physics;
 
 namespace Move
 {
-    [BurstCompile, UpdateAfter(typeof(ThinkingEntitySystem))]
+    [BurstCompile, UpdateAfter(typeof(ThinkingSystem))]
     public partial struct MovementByThoughSystem : ISystem
     {
         [BurstCompile]

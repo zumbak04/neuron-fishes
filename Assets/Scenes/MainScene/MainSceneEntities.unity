@@ -169,9 +169,9 @@ MonoBehaviour:
     <HiddenLayerSize>k__BackingField: 4
     <HiddenLayersCount>k__BackingField: 8
   <Seeing>k__BackingField:
-    <Cooldown>k__BackingField: 0.2
     <MinRange>k__BackingField: 10
     <MaxRange>k__BackingField: 20
+    <StaggeringInterval>k__BackingField: 4
   <Movement>k__BackingField:
     <MinAcceleration>k__BackingField: 2
     <MaxAcceleration>k__BackingField: 6

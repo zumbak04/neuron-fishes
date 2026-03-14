@@ -8,7 +8,7 @@ using Unity.Mathematics;
 namespace Brain
 {
     [BurstCompile, UpdateAfter(typeof(SightSystem))]
-    public partial struct ThinkingChunkSystem : ISystem
+    public partial struct ThinkingSystem : ISystem
     {
         private EntityQuery _entityQuery;
 
@@ -60,12 +60,11 @@ namespace Brain
                 NativeArray<ThoughOutput> thoughOutputs = chunk.GetNativeArray(ref ThoughOutputHandle);
                 
                 // Раньше использовал FixedList.
-                // Теперь нет лишней обертки. Можно сделать двойную буферизацию. На 1мс быстрее.
+                // Теперь нет лишней обертки. Можно сделать двойную буферизацию.
                 float* pCurrValues = stackalloc float[ThinkingConsts.MAX_LAYER_SIZE];
                 float* pNextValues = stackalloc float[ThinkingConsts.MAX_LAYER_SIZE];
 
-                ChunkEntityEnumerator entityEnumerator =
-                    new ChunkEntityEnumerator(useEnabledMask, chunkEnabledMask, chunk.Count);
+                ChunkEntityEnumerator entityEnumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
 
                 while (entityEnumerator.NextEntityIndex(out int i)) {
                     Thinking thinking = thinkings[i];

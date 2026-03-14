@@ -1,34 +1,49 @@
-using Brain;
 using Config;
+using Diet;
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace Sight
 {
-    // todo zumbak подумать может можно ещё оптимизировать?
     [BurstCompile]
     public partial struct SightSystem : ISystem
     {
-        private NativeParallelMultiHashMap<int, SpatialHashItem> _spatialHash;
+        private EntityQuery _targetQuery;
+        private EntityQuery _seeingQuery;
 
-        private struct SpatialHashItem
-        {
-            public Entity Entity;
-            public float2 Position;
-        }
+        private EntityTypeHandle _entityHandle;
+        private ComponentTypeHandle<Biting> _bitingHandle;
+        private ComponentTypeHandle<LocalTransform> _transformHandle;
+        private ComponentTypeHandle<Seeing> _seeingHandle;
+        private ComponentTypeHandle<SeenEvent> _seenEventHandle;
+
+        private NativeParallelMultiHashMap<uint, SpatialHashItem> _spatialHash;
+        private uint _frameCount;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<MainConfig>();
-            state.RequireForUpdate<Seeing>();
-            state.RequireForUpdate<SightTargetTag>();
+            _targetQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<SightTargetTag, LocalTransform>()
+                .Build(ref state);
+            _seeingQuery = new EntityQueryBuilder(Allocator.Temp).WithAll<LocalTransform, Seeing>()
+                .WithDisabled<SeenEvent>()
+                .Build(ref state);
 
-            _spatialHash = new NativeParallelMultiHashMap<int, SpatialHashItem>(1024, Allocator.Persistent);
+            state.RequireForUpdate<MainConfig>();
+            state.RequireForUpdate(_targetQuery);
+            state.RequireForUpdate(_seeingQuery);
+
+            _entityHandle = state.GetEntityTypeHandle();
+            _bitingHandle = state.GetComponentTypeHandle<Biting>(true);
+            _transformHandle = state.GetComponentTypeHandle<LocalTransform>(true);
+            _seeingHandle = state.GetComponentTypeHandle<Seeing>(true);
+            _seenEventHandle = state.GetComponentTypeHandle<SeenEvent>();
+
+            _spatialHash = new NativeParallelMultiHashMap<uint, SpatialHashItem>(1024, Allocator.Persistent);
         }
 
         [BurstCompile]
@@ -42,151 +57,210 @@ namespace Sight
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var config = SystemAPI.GetSingleton<MainConfig>();
-
-            // Уменьшаем Cooldown и смотрим есть ли вообще работа в этом кадре
-            var anyToUpdate = false;
-            foreach (var seeing in SystemAPI.Query<RefRW<Seeing>>()) {
-                if (seeing.ValueRO.Cooldown > 0) {
-                    seeing.ValueRW.Cooldown -= SystemAPI.Time.DeltaTime;
-                }
-                else {
-                    anyToUpdate = true;
-                }
-            }
-
-            if (!anyToUpdate) {
-                return;
-            }
-
-            float cellSize = math.max(1f, config.Seeing.MaxRange);
+            var mainConfig = SystemAPI.GetSingleton<MainConfig>();
+            float cellSize = math.max(1f, mainConfig.Seeing.MaxRange);
 
             // Переиспользуем буфер. Ёмкость подстраиваем по числу целей.
-            int targetCount = SystemAPI.QueryBuilder().WithAll<SightTargetTag, LocalTransform>().Build()
-                .CalculateEntityCount();
+            int targetCount = _targetQuery.CalculateEntityCount();
             if (_spatialHash.Capacity < targetCount * 2) {
                 _spatialHash.Capacity = math.max(_spatialHash.Capacity, targetCount * 2);
             }
 
             _spatialHash.Clear();
 
-            JobHandle buildHashJobHandle = new BuildSpatialHashJob {
-                CellSize = cellSize,
-                Writer = _spatialHash.AsParallelWriter()
-            }.ScheduleParallel(state.Dependency);
+            _frameCount++;
 
-            state.Dependency = new TrySeeSpatialTargetsJob {
-                Cooldown = config.Seeing.Cooldown,
+            _entityHandle.Update(ref state);
+            _bitingHandle.Update(ref state);
+            _transformHandle.Update(ref state);
+            _seeingHandle.Update(ref state);
+            _seenEventHandle.Update(ref state);
+
+            BuildSpatialHashJob buildSpatialHashJob = new() {
+                EntityHandle = _entityHandle,
+                BitingHandle = _bitingHandle,
+                TransformHandle = _transformHandle,
+                HashWriter = _spatialHash.AsParallelWriter(),
+                CellSize = cellSize
+            };
+
+            state.Dependency = buildSpatialHashJob.ScheduleParallel(_targetQuery, state.Dependency);
+
+            TrySeeSpatialTargetsJob trySeeSpatialTargetsJob = new() {
+                EntityHandle = _entityHandle,
+                BitingHandle = _bitingHandle,
+                TransformHandle = _transformHandle,
+                SeeingHandle = _seeingHandle,
+                HashReader = _spatialHash.AsReadOnly(),
+                SeenEventHandle = _seenEventHandle,
                 CellSize = cellSize,
-                SpatialHash = _spatialHash.AsReadOnly()
-            }.ScheduleParallel(buildHashJobHandle);
+                FrameCount = _frameCount,
+                StaggeringInterval = mainConfig.Seeing.StaggeringInterval
+            };
+
+            state.Dependency = trySeeSpatialTargetsJob.ScheduleParallel(_seeingQuery, state.Dependency);
         }
 
-        [BurstCompile, WithAll(typeof(SightTargetTag))]
-        private partial struct BuildSpatialHashJob : IJobEntity
+        [BurstCompile]
+        private struct BuildSpatialHashJob : IJobChunk
         {
+            [ReadOnly] public EntityTypeHandle EntityHandle;
+            [ReadOnly] public ComponentTypeHandle<Biting> BitingHandle;
+            [ReadOnly] public ComponentTypeHandle<LocalTransform> TransformHandle;
+            public NativeParallelMultiHashMap<uint, SpatialHashItem>.ParallelWriter HashWriter;
             public float CellSize;
-            public NativeParallelMultiHashMap<int, SpatialHashItem>.ParallelWriter Writer;
 
-            private void Execute(Entity entity, in LocalTransform transform)
+            public unsafe void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask,
+                in v128 chunkEnabledMask)
             {
-                float2 pos = transform.Position.xy;
-                var cell = (int2)math.floor(pos / CellSize);
-                var key = (int)math.hash(cell);
+                Entity* pEntities = chunk.GetEntityDataPtrRO(EntityHandle);
+                var pTransforms = (LocalTransform*)chunk.GetRequiredComponentDataPtrRO(ref TransformHandle);
+                Biting* pBitings = chunk.GetComponentDataPtrRO(ref BitingHandle);
 
-                Writer.Add(key, new SpatialHashItem {
-                    Entity = entity,
-                    Position = pos
-                });
+                ChunkEntityEnumerator entityEnumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
+                while (entityEnumerator.NextEntityIndex(out int i)) {
+                    float2 pos = pTransforms[i].Position.xy;
+                    var cell = (int2)math.floor(pos / CellSize);
+                    uint key = math.hash(cell);
+                    float bitingStrength = 0;
+                    if (pBitings != null) {
+                        bitingStrength = pBitings[i].Strength;
+                    }
+
+                    HashWriter.Add(key, new SpatialHashItem {
+                        Entity = pEntities[i],
+                        Position = pos,
+                        BitingStrength = bitingStrength
+                    });
+                }
             }
         }
 
-        [BurstCompile, WithDisabled(typeof(SeenEvent))]
-        private partial struct TrySeeSpatialTargetsJob : IJobEntity
+        [BurstCompile]
+        private struct TrySeeSpatialTargetsJob : IJobChunk
         {
-            public float Cooldown;
+            [ReadOnly] public EntityTypeHandle EntityHandle;
+            [ReadOnly] public ComponentTypeHandle<Biting> BitingHandle;
+            [ReadOnly] public ComponentTypeHandle<LocalTransform> TransformHandle;
+            [ReadOnly] public ComponentTypeHandle<Seeing> SeeingHandle;
+            [ReadOnly] public NativeParallelMultiHashMap<uint, SpatialHashItem>.ReadOnly HashReader;
+            public ComponentTypeHandle<SeenEvent> SeenEventHandle;
             public float CellSize;
-            [ReadOnly] public NativeParallelMultiHashMap<int, SpatialHashItem>.ReadOnly SpatialHash;
+            public uint FrameCount;
+            public ushort StaggeringInterval;
 
-            // todo zumbak нужно уменшить Cognitive Complexity
-            private void Execute(Entity entity,
-                ref Seeing seeing,
-                ref SeenEvent seenEvent,
-                EnabledRefRW<SeenEvent> seenEventEnabled,
-                in LocalTransform transform)
+            public unsafe void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask,
+                in v128 chunkEnabledMask)
             {
-                if (seeing.Cooldown > 0) {
-                    // Гарантируем, что событие выключено.
-                    seenEventEnabled.ValueRW = false;
+                if (StaggeringInterval > 1 &&
+                    unfilteredChunkIndex % StaggeringInterval != FrameCount % StaggeringInterval) {
                     return;
                 }
-                
-                seeing.Cooldown = Cooldown;
 
-                float2 selfPos = transform.Position.xy;
-                float rangeSq = seeing.Range * seeing.Range;
+                Entity* pEntities = chunk.GetEntityDataPtrRO(EntityHandle);
+                var pTransforms = (LocalTransform*)chunk.GetRequiredComponentDataPtrRO(ref TransformHandle);
+                var pSeeing = (Seeing*)chunk.GetRequiredComponentDataPtrRO(ref SeeingHandle);
+                var pSeenEvents = (SeenEvent*)chunk.GetRequiredComponentDataPtrRW(ref SeenEventHandle);
+                Biting* pBitings = chunk.GetComponentDataPtrRO(ref BitingHandle);
+                EnabledMask seenEventEnabledMask = chunk.GetEnabledMask(ref SeenEventHandle);
 
-                SightTarget fishTarget = new();
+                ChunkEntityEnumerator entityEnumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
 
-                var selfCell = (int2)math.floor(selfPos / CellSize);
+                while (entityEnumerator.NextEntityIndex(out int i)) {
+                    Target biterTarget = new();
+                    Target preyTarget = new();
 
-                for (int dy = -1; dy <= 1; dy++)
-                for (int dx = -1; dx <= 1; dx++) {
-                    int2 cell = selfCell + new int2(dx, dy);
-                    var key = (int)math.hash(cell);
+                    float2 position = pTransforms[i].Position.xy;
+                    SelfData selfData = new() {
+                        Cell = (int2)math.floor(position / CellSize),
+                        Position = position,
+                        Entity = pEntities[i],
+                        BitingStrength = pBitings != null ? pBitings[i].Strength : 0,
+                        SeeingRangeSq = math.lengthsq(pSeeing[i].Range)
+                    };
 
-                    if (!SpatialHash.TryGetFirstValue(key, out SpatialHashItem hashItem,
-                            out NativeParallelMultiHashMapIterator<int> it)) {
+                    for (int dy = -1; dy <= 1; dy++) {
+                        for (int dx = -1; dx <= 1; dx++) {
+                            ProcessCell(dx, dy, in selfData, ref biterTarget, ref preyTarget);
+                        }
+                    }
+
+                    pSeenEvents[i].ToTargets[0] = biterTarget.To;
+                    pSeenEvents[i].ToTargets[1] = preyTarget.To;
+
+                    seenEventEnabledMask[i] = true;
+                }
+            }
+
+            private void ProcessCell(int dx, int dy, in SelfData selfData, ref Target biterTarget,
+                ref Target preyTarget)
+            {
+                int2 cell = selfData.Cell + new int2(dx, dy);
+                uint key = math.hash(cell);
+
+                if (!HashReader.TryGetFirstValue(key, out SpatialHashItem hashItem,
+                        out NativeParallelMultiHashMapIterator<uint> it)) {
+                    return;
+                }
+
+                do {
+                    if (hashItem.Entity == selfData.Entity) {
                         continue;
                     }
 
-                    do {
-                        if (hashItem.Entity == entity) {
-                            continue;
-                        }
+                    float2 to = hashItem.Position - selfData.Position;
 
-                        float2 to = hashItem.Position - selfPos;
+                    float distanceSq = math.lengthsq(to);
+                    if (distanceSq > selfData.SeeingRangeSq) {
+                        continue;
+                    }
 
-                        float distanceSq = math.lengthsq(to);
-                        if (distanceSq > rangeSq) {
-                            continue;
-                        }
+                    if (hashItem.BitingStrength > selfData.BitingStrength) {
+                        biterTarget.TryUpdateNearest(to, distanceSq);
+                    }
+                    else {
+                        preyTarget.TryUpdateNearest(to, distanceSq);
+                    }
+                } while (HashReader.TryGetNextValue(out hashItem, ref it));
+            }
 
-                        fishTarget.TryUpdateNearest(to, distanceSq);
-                    } while (SpatialHash.TryGetNextValue(out hashItem, ref it));
+            private struct Target
+            {
+                public float2 To { get; private set; }
+                private float _distanceSq;
+
+                public Target()
+                {
+                    To = float2.zero;
+                    _distanceSq = float.MaxValue;
                 }
 
-                seenEvent.ToTargets.Length = ThinkingConsts.INPUT_SIZE;
-                seenEvent.ToTargets[0] = fishTarget.To;
-                // todo zumbak
-                seenEvent.ToTargets[1] = float2.zero;
-                seenEvent.ToTargets[2] = float2.zero;
+                public void TryUpdateNearest(float2 to, float distanceSq)
+                {
+                    if (distanceSq >= _distanceSq) {
+                        return;
+                    }
 
-                seenEventEnabled.ValueRW = true;
+                    To = to;
+                    _distanceSq = distanceSq;
+                }
+            }
+
+            private struct SelfData
+            {
+                public int2 Cell;
+                public float2 Position;
+                public Entity Entity;
+                public float BitingStrength;
+                public float SeeingRangeSq;
             }
         }
 
-        private struct SightTarget
+        private struct SpatialHashItem
         {
-            public float2 To { get; private set; }
-            private float _distanceSq;
-
-            public SightTarget()
-            {
-                To = float2.zero;
-                _distanceSq = float.MaxValue;
-            }
-
-            public bool TryUpdateNearest(float2 to, float distanceSq)
-            {
-                if (distanceSq >= _distanceSq) {
-                    return false;
-                }
-
-                To = to;
-                _distanceSq = distanceSq;
-                return true;
-            }
+            public Entity Entity;
+            public float2 Position;
+            public float BitingStrength;
         }
     }
 }
