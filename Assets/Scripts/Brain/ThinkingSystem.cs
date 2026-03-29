@@ -61,8 +61,8 @@ namespace Brain
                 
                 // Раньше использовал FixedList.
                 // Теперь нет лишней обертки. Можно сделать двойную буферизацию.
-                float* pCurrValues = stackalloc float[ThinkingConsts.MAX_LAYER_SIZE];
-                float* pNextValues = stackalloc float[ThinkingConsts.MAX_LAYER_SIZE];
+                float* pCurrNodeSignals = stackalloc float[ThinkingConsts.MAX_LAYER_SIZE];
+                float* pNextNodeSignals = stackalloc float[ThinkingConsts.MAX_LAYER_SIZE];
 
                 ChunkEntityEnumerator entityEnumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
 
@@ -72,33 +72,33 @@ namespace Brain
                     
                     // Заполняем currValues изначальными данными.
                     for (var j = 0; j < seenEvent.ToTargets.Length; j++) {
-                        pCurrValues[j] = math.lengthsq(seenEvent.ToTargets[j]);
+                        pCurrNodeSignals[j] = math.lengthsq(seenEvent.ToTargets[j]);
                     }
-
+                    
                     for (var layer = 0; layer < thinking.LayerSizes.Length - 1; layer++) {
                         int currLayerSize = thinking.LayerSizes[layer];
                         int nextLayerSize = thinking.LayerSizes[layer + 1];
 
                         for (var nextNode = 0; nextNode < nextLayerSize; nextNode++) {
-                            float sumSignal = 0;
+                            float sumNodeSignal = 0;
 
                             for (var currNode = 0; currNode < currLayerSize; currNode++) {
-                                float signal = pCurrValues[currNode];
-                                sumSignal += signal * thinking.GetWeight(layer, nextNode, currNode);
+                                float signal = pCurrNodeSignals[currNode];
+                                sumNodeSignal += signal * thinking.GetWeight(layer, nextNode, currNode);
                             }
 
-                            pNextValues[nextNode] = sumSignal;
+                            pNextNodeSignals[nextNode] = sumNodeSignal;
                         }
 
-                        float* pTemp = pCurrValues;
-                        pCurrValues = pNextValues;
-                        pNextValues = pTemp;
+                        float* pTemp = pCurrNodeSignals;
+                        pCurrNodeSignals = pNextNodeSignals;
+                        pNextNodeSignals = pTemp;
                     }
 
                     // Умножаем все вектора до целей на финальное значение узла.
                     float2 direction = float2.zero;
                     for (var j = 0; j < seenEvent.ToTargets.Length; j++) {
-                        direction += seenEvent.ToTargets[j] * pCurrValues[j];
+                        direction += seenEvent.ToTargets[j] * pCurrNodeSignals[j];
                     }
 
                     thoughOutputs[i] = new ThoughOutput {

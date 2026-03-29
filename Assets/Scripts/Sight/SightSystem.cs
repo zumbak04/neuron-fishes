@@ -1,5 +1,6 @@
 using Config;
 using Diet;
+using Reproduction;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -19,6 +20,7 @@ namespace Sight
         private ComponentTypeHandle<Biting> _bitingHandle;
         private ComponentTypeHandle<LocalTransform> _transformHandle;
         private ComponentTypeHandle<Seeing> _seeingHandle;
+        private ComponentTypeHandle<Family> _familyHandle;
         private ComponentTypeHandle<SeenEvent> _seenEventHandle;
 
         private NativeParallelMultiHashMap<uint, SpatialHashItem> _spatialHash;
@@ -41,6 +43,7 @@ namespace Sight
             _bitingHandle = state.GetComponentTypeHandle<Biting>(true);
             _transformHandle = state.GetComponentTypeHandle<LocalTransform>(true);
             _seeingHandle = state.GetComponentTypeHandle<Seeing>(true);
+            _familyHandle = state.GetComponentTypeHandle<Family>(true);
             _seenEventHandle = state.GetComponentTypeHandle<SeenEvent>();
 
             _spatialHash = new NativeParallelMultiHashMap<uint, SpatialHashItem>(1024, Allocator.Persistent);
@@ -74,12 +77,14 @@ namespace Sight
             _bitingHandle.Update(ref state);
             _transformHandle.Update(ref state);
             _seeingHandle.Update(ref state);
+            _familyHandle.Update(ref state);
             _seenEventHandle.Update(ref state);
 
             BuildSpatialHashJob buildSpatialHashJob = new() {
                 EntityHandle = _entityHandle,
                 BitingHandle = _bitingHandle,
                 TransformHandle = _transformHandle,
+                FamilyHandle = _familyHandle,
                 HashWriter = _spatialHash.AsParallelWriter(),
                 CellSize = cellSize
             };
@@ -91,6 +96,7 @@ namespace Sight
                 BitingHandle = _bitingHandle,
                 TransformHandle = _transformHandle,
                 SeeingHandle = _seeingHandle,
+                FamilyHandle = _familyHandle,
                 HashReader = _spatialHash.AsReadOnly(),
                 SeenEventHandle = _seenEventHandle,
                 CellSize = cellSize,
@@ -107,6 +113,7 @@ namespace Sight
             [ReadOnly] public EntityTypeHandle EntityHandle;
             [ReadOnly] public ComponentTypeHandle<Biting> BitingHandle;
             [ReadOnly] public ComponentTypeHandle<LocalTransform> TransformHandle;
+            [ReadOnly] public ComponentTypeHandle<Family> FamilyHandle;
             public NativeParallelMultiHashMap<uint, SpatialHashItem>.ParallelWriter HashWriter;
             public float CellSize;
 
@@ -115,6 +122,7 @@ namespace Sight
             {
                 Entity* pEntities = chunk.GetEntityDataPtrRO(EntityHandle);
                 var pTransforms = (LocalTransform*)chunk.GetRequiredComponentDataPtrRO(ref TransformHandle);
+                var pFamilies = (Family*)chunk.GetRequiredComponentDataPtrRO(ref FamilyHandle);
                 Biting* pBitings = chunk.GetComponentDataPtrRO(ref BitingHandle);
 
                 ChunkEntityEnumerator entityEnumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
@@ -130,7 +138,8 @@ namespace Sight
                     HashWriter.Add(key, new SpatialHashItem {
                         Entity = pEntities[i],
                         Position = pos,
-                        BitingStrength = bitingStrength
+                        BitingStrength = bitingStrength,
+                        Family = pFamilies[i]
                     });
                 }
             }
@@ -143,8 +152,10 @@ namespace Sight
             [ReadOnly] public ComponentTypeHandle<Biting> BitingHandle;
             [ReadOnly] public ComponentTypeHandle<LocalTransform> TransformHandle;
             [ReadOnly] public ComponentTypeHandle<Seeing> SeeingHandle;
-            [ReadOnly] public NativeParallelMultiHashMap<uint, SpatialHashItem>.ReadOnly HashReader;
+            [ReadOnly] public ComponentTypeHandle<Family> FamilyHandle;
             public ComponentTypeHandle<SeenEvent> SeenEventHandle;
+
+            [ReadOnly] public NativeParallelMultiHashMap<uint, SpatialHashItem>.ReadOnly HashReader;
             public float CellSize;
             public uint FrameCount;
             public ushort StaggeringInterval;
@@ -160,8 +171,11 @@ namespace Sight
                 Entity* pEntities = chunk.GetEntityDataPtrRO(EntityHandle);
                 var pTransforms = (LocalTransform*)chunk.GetRequiredComponentDataPtrRO(ref TransformHandle);
                 var pSeeing = (Seeing*)chunk.GetRequiredComponentDataPtrRO(ref SeeingHandle);
-                var pSeenEvents = (SeenEvent*)chunk.GetRequiredComponentDataPtrRW(ref SeenEventHandle);
+                var pFamilies = (Family*)chunk.GetRequiredComponentDataPtrRO(ref FamilyHandle);
                 Biting* pBitings = chunk.GetComponentDataPtrRO(ref BitingHandle);
+
+                var pSeenEvents = (SeenEvent*)chunk.GetRequiredComponentDataPtrRW(ref SeenEventHandle);
+
                 EnabledMask seenEventEnabledMask = chunk.GetEnabledMask(ref SeenEventHandle);
 
                 ChunkEntityEnumerator entityEnumerator = new(useEnabledMask, chunkEnabledMask, chunk.Count);
@@ -169,6 +183,7 @@ namespace Sight
                 while (entityEnumerator.NextEntityIndex(out int i)) {
                     Target biterTarget = new();
                     Target preyTarget = new();
+                    Target familyTarget = new();
 
                     float2 position = pTransforms[i].Position.xy;
                     SelfData selfData = new() {
@@ -181,19 +196,21 @@ namespace Sight
 
                     for (int dy = -1; dy <= 1; dy++) {
                         for (int dx = -1; dx <= 1; dx++) {
-                            ProcessCell(dx, dy, in selfData, ref biterTarget, ref preyTarget);
+                            ProcessCell(dx, dy, in selfData, in pFamilies[i], ref biterTarget, ref preyTarget,
+                                ref familyTarget);
                         }
                     }
 
                     pSeenEvents[i].ToTargets[0] = biterTarget.To;
                     pSeenEvents[i].ToTargets[1] = preyTarget.To;
+                    pSeenEvents[i].ToTargets[2] = familyTarget.To;
 
                     seenEventEnabledMask[i] = true;
                 }
             }
 
-            private void ProcessCell(int dx, int dy, in SelfData selfData, ref Target biterTarget,
-                ref Target preyTarget)
+            private void ProcessCell(int dx, int dy, in SelfData selfData, in Family selfFamily, ref Target biterTarget,
+                ref Target preyTarget, ref Target familyTarget)
             {
                 int2 cell = selfData.Cell + new int2(dx, dy);
                 uint key = math.hash(cell);
@@ -215,7 +232,10 @@ namespace Sight
                         continue;
                     }
 
-                    if (hashItem.BitingStrength > selfData.BitingStrength) {
+                    if (FamilyUtils.AreRelated(selfData.Entity, hashItem.Entity, in selfFamily, in hashItem.Family)) {
+                        familyTarget.TryUpdateNearest(to, distanceSq);
+                    }
+                    else if (hashItem.BitingStrength > selfData.BitingStrength) {
                         biterTarget.TryUpdateNearest(to, distanceSq);
                     }
                     else {
@@ -255,12 +275,13 @@ namespace Sight
                 public float SeeingRangeSq;
             }
         }
-
+        
         private struct SpatialHashItem
         {
             public Entity Entity;
             public float2 Position;
             public float BitingStrength;
+            public Family Family;
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace Diet
 {
-    [BurstCompile, UpdateAfter(typeof(BiteEntitySystem))]
+    [BurstCompile, UpdateAfter(typeof(BiteSystem))]
     public partial struct NutrientBiteTransferSystem : ISystem
     {
         [BurstCompile]
@@ -16,7 +17,7 @@ namespace Diet
 
             foreach (var (tookBiteEvent, nutritious) in SystemAPI
                          .Query<RefRO<TookBiteEvent>, RefRW<Nutritious>>()) {
-                nutritious.ValueRW.Current += tookBiteEvent.ValueRO.NutrientGain;
+                nutritious.ValueRW.Current = math.min(nutritious.ValueRO.Current + tookBiteEvent.ValueRO.NutrientGain, nutritious.ValueRO.Limit);
             }
         }
     }

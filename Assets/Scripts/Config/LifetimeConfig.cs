@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 namespace Config
 {
     [Serializable]
-    public struct LifeConfig
+    public struct LifetimeConfig
     {
         [field: SerializeField]
         public float MinLifetime { get; private set; }

@@ -1,4 +1,5 @@
-﻿using Config;
+﻿using Brain;
+using Config;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -9,17 +10,16 @@ using Unity.Transforms;
 
 namespace Move
 {
-    // todo zumbak поворачивать рыб на цель чтобы они не терлись боками друг от друга до смерти
     [BurstCompile, UpdateInGroup(typeof(BeforePhysicsSystemGroup))]
-    public partial struct AngularVelocityAlongLinearSystem : ISystem
+    public partial struct AngularVelocityByThoughSystem : ISystem
     {
-        private const float LINEAR_SPEED_EPSILON_SQ = 0.1f;
+        private const float EPSILON_SQ = 0.1f;
             
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<PhysicsVelocity, LocalTransform, Moving>().Build(ref state);
+                .WithAll<LocalTransform, ThoughOutput, PhysicsVelocity, Moving>().Build(ref state);
 
             state.RequireForUpdate<MainConfig>();
             state.RequireForUpdate(query);
@@ -44,15 +44,15 @@ namespace Move
             public float Smoothness;
             public float MaxAngularVelocity;
 
-            private void Execute(ref PhysicsVelocity velocity, in LocalTransform transform)
+            private void Execute(in LocalTransform transform, in ThoughOutput thoughOutput, ref PhysicsVelocity velocity)
             {
-                float2 linearVelocity = velocity.Linear.xy;
-                // Если линейная скорость ниже, то мы не трогаем угловую. Лишняя угловая скорость загаситься Damping системой.
-                if (math.lengthsq(linearVelocity) < LINEAR_SPEED_EPSILON_SQ) {
+                float2 thoughDirection = thoughOutput.Direction;
+                // Если direction меньше, мы не трогаем угловую. Лишняя угловая скорость загаситься Damping системой.
+                if (math.lengthsq(thoughDirection) < EPSILON_SQ) {
                     return;
                 }
                 
-                float targetAngle = math.atan2(velocity.Linear.y, velocity.Linear.x) - math.PIHALF;
+                float targetAngle = math.atan2(thoughDirection.y, thoughDirection.x) - math.PIHALF;
 
                 float currentAngle = 2.0f * math.atan2(transform.Rotation.value.z, transform.Rotation.value.w);
 

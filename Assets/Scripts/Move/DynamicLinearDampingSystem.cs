@@ -1,4 +1,4 @@
-﻿using Config;
+using Config;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -24,11 +24,11 @@ namespace Move
         public void OnUpdate(ref SystemState state)
         {
             var config = SystemAPI.GetSingleton<MainConfig>();
-            float maxSpeedSq = math.lengthsq(config.Movement.MaxSpeed);
+            float maxSpeedSq = math.lengthsq(config.Movement.MaxLinearSpeed);
 
             CalculateDampingJob calculateDampingJob = new() {
                 MaxSpeedSq = maxSpeedSq,
-                MinDamping = config.Movement.MinDamping
+                MinDamping = config.Movement.MinLinearDamping
             };
 
             state.Dependency = calculateDampingJob.ScheduleParallel(state.Dependency);

@@ -64,7 +64,7 @@ namespace Diet
     {
         public float Strength;
         
-        // 3 элемента, 16 битов на каждый BitingRay + 4 бита на header
+        // 3 элемента, 16 байт на каждый BitingRay + 4 байта на header
         public FixedList64Bytes<BitingRay> Rays;
     }
     

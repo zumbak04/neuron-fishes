@@ -20,9 +20,9 @@ namespace Diet
         public void OnUpdate(ref SystemState state)
         {
             foreach (var (nutritious, synthesizing) in SystemAPI.Query<RefRW<Nutritious>, RefRO<Synthesizing>>()) {
-                float maxDelta = nutritious.ValueRO.Limit - nutritious.ValueRO.Current;
-                nutritious.ValueRW.Current +=
-                    math.min(maxDelta, synthesizing.ValueRO.Strength * SystemAPI.Time.DeltaTime);
+                nutritious.ValueRW.Current =
+                    math.min(nutritious.ValueRO.Current + synthesizing.ValueRO.Strength * SystemAPI.Time.DeltaTime,
+                        nutritious.ValueRO.Limit);
             }
         }
     }

@@ -4,7 +4,7 @@ using Unity.Entities;
 namespace Diet
 {
     [BurstCompile, UpdateAfter(typeof(NutrientDecaySystem)), UpdateAfter(typeof(SynthesisSystem)),
-     UpdateAfter(typeof(NutrientBiteTransferSystem)), UpdateAfter(typeof(BiteChunkSystem))]
+     UpdateAfter(typeof(NutrientBiteTransferSystem))]
     public partial struct NutrientDepletionSystem : ISystem
     {
         [BurstCompile]

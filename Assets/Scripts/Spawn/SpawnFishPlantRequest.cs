@@ -1,7 +1,8 @@
 ﻿using Brain;
 using Diet;
-using Life;
+using Lifetime;
 using Move;
+using Reproduction;
 using Sight;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -17,6 +18,8 @@ namespace Spawn
         public Moving Moving;
         public Nutritious Nutritious;
         public Lasting Lasting;
+        public Reproductive Reproductive;
+        
         public Synthesizing Synthesizing;
     }
 }

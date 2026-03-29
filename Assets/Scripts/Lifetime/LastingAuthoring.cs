@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 
-namespace Life
+namespace Lifetime
 {
     public class LastingAuthoring : MonoBehaviour
     {

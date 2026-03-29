@@ -3,9 +3,10 @@ using Config;
 using Diet;
 using IngameDebugConsole;
 using JetBrains.Annotations;
-using Life;
+using Lifetime;
 using Math;
 using Move;
+using Reproduction;
 using Sight;
 using Spawn;
 using Unity.Collections;
@@ -37,6 +38,7 @@ namespace Console
                 Moving = CreateBestMoving(in mainConfig),
                 Nutritious = CreateBestNutritious(in mainConfig),
                 Lasting = CreateBestLasting(in mainConfig),
+                Reproductive = default,
                 Biting = CreateBestBiting(in mainConfig)
             };
             Resolve<SpawnService>().SpawnBiterFish(in request);
@@ -58,16 +60,44 @@ namespace Console
                 Moving = CreateBestMoving(in mainConfig),
                 Nutritious = CreateBestNutritious(in mainConfig),
                 Lasting = CreateBestLasting(in mainConfig),
+                Reproductive = default,
                 Synthesizing = CreateBestSynthesizing(in mainConfig)
             };
             Resolve<SpawnService>().SpawnPlantFish(in request);
             Debug.Log($"Spawned curious plant fish on position={position}");
         }
+        
+        [ConsoleMethod("spawn.tastyFish", "Спавнит вкусную рыбу в центре камеры.")]
+        public static void SpawnTastyFish()
+        {
+            var mainConfig = EcsWorldUtils.GetSingleton<MainConfig>();
 
-        [ConsoleMethod("time.scale", "Изменить Time.timeScale")]
+            UnityEngine.Camera current = UnityEngine.Camera.main;
+            float2 position = current!.transform.position.ToFloat2();
+            SpawnFishPlantRequest request = new() {
+                Count = 1,
+                Position = position,
+                Thinking = new Thinking(new FixedList32Bytes<ushort>()),
+                Nutritious = new Nutritious {
+                    Current = mainConfig.Diet.MaxNutrients - 1,
+                    Limit = mainConfig.Diet.MaxNutrients
+                },
+                Lasting = CreateBestLasting(in mainConfig),
+            };
+            Resolve<SpawnService>().SpawnPlantFish(in request);
+            Debug.Log($"Spawned tasty fish on position={position}");
+        }
+
+        [ConsoleMethod("time.scale", "Изменить Time.timeScale.")]
         public static void TimeScale(float value)
         {
             Time.timeScale = value;
+        }
+        
+        [ConsoleMethod("pause", "Ставит мир на паузу (Time.timeScale=0).")]
+        public static void TimeScale()
+        {
+            Time.timeScale = 0;
         }
 
         private static T Resolve<T>()
@@ -99,14 +129,14 @@ namespace Console
         private static Moving CreateBestMoving(in MainConfig mainConfig)
         {
             return new Moving {
-                Acceleration = mainConfig.Movement.MaxAcceleration
+                Acceleration = mainConfig.Movement.MaxLinearAcceleration
             };
         }
         
         private static Nutritious CreateBestNutritious(in MainConfig mainConfig)
         {
             return new Nutritious {
-                Current = DietUtils.CurNutrientsFromLimit(mainConfig.Diet.MaxNutrients),
+                Current = NutritiousUtils.CurrentFromLimit(mainConfig.Diet.MaxNutrients),
                 Limit = mainConfig.Diet.MaxNutrients
             };
         }
@@ -114,7 +144,7 @@ namespace Console
         private static Lasting CreateBestLasting(in MainConfig mainConfig)
         {
             return new Lasting {
-                Lifetime = mainConfig.Life.MaxLifetime
+                Lifetime = mainConfig.Lifetime.MaxLifetime
             };
         }
         

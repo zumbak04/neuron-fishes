@@ -13,11 +13,11 @@ namespace DI
     {
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<InputService>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
+            builder.Register<InputService>(VContainer.Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
 
-            builder.Register<InitService>(Lifetime.Scoped).AsSelf().AsImplementedInterfaces();
-            builder.Register<SpawnService>(Lifetime.Scoped).AsSelf();
-            builder.Register<WorldBoundsService>(Lifetime.Scoped).AsSelf();
+            builder.Register<InitService>(VContainer.Lifetime.Scoped).AsSelf().AsImplementedInterfaces();
+            builder.Register<SpawnService>(VContainer.Lifetime.Scoped).AsSelf();
+            builder.Register<WorldBoundsService>(VContainer.Lifetime.Scoped).AsSelf();
             builder.RegisterSystemFromDefaultWorld<EndSimulationEntityCommandBufferSystem>();
 
             ConsoleCommands.Scope = this;

@@ -1,4 +1,6 @@
-﻿using Unity.Entities;
+﻿using Move;
+using Reproduction;
+using Unity.Entities;
 using UnityEngine;
 
 namespace Config
@@ -19,7 +21,10 @@ namespace Config
         public DietConfig Diet { get; private set; }
 
         [field: SerializeField]
-        public LifeConfig Life { get; private set; }
+        public LifetimeConfig Lifetime { get; private set; }
+        
+        [field: SerializeField]
+        public ReproductionConfig Reproduction { get; private set; }
 
         private class Baker : Baker<MainConfigAuthoring>
         {
@@ -31,7 +36,8 @@ namespace Config
                     Seeing = authoring.Seeing,
                     Movement = authoring.Movement,
                     Diet = authoring.Diet,
-                    Life = authoring.Life
+                    Lifetime = authoring.Lifetime,
+                    Reproduction = authoring.Reproduction
                 });
             }
         }
@@ -47,6 +53,8 @@ namespace Config
 
         public DietConfig Diet;
 
-        public LifeConfig Life;
+        public LifetimeConfig Lifetime;
+
+        public ReproductionConfig Reproduction;
     }
 }

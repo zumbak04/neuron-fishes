@@ -166,33 +166,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Thinking>k__BackingField:
-    <HiddenLayerSize>k__BackingField: 4
-    <HiddenLayersCount>k__BackingField: 8
+    <HiddenLayerSize>k__BackingField: 12
+    <HiddenLayersCount>k__BackingField: 2
   <Seeing>k__BackingField:
     <MinRange>k__BackingField: 10
     <MaxRange>k__BackingField: 20
-    <StaggeringInterval>k__BackingField: 4
+    <StaggeringInterval>k__BackingField: 8
   <Movement>k__BackingField:
-    <MinAcceleration>k__BackingField: 2
-    <MaxAcceleration>k__BackingField: 6
-    <MaxSpeed>k__BackingField: 20
-    <MinDamping>k__BackingField: 0.35
-    <RotationSmoothness>k__BackingField: 5
+    <MinLinearAcceleration>k__BackingField: 2
+    <MaxLinearAcceleration>k__BackingField: 6
+    <MaxLinearSpeed>k__BackingField: 20
+    <MinLinearDamping>k__BackingField: 0.35
+    <MisalignedLinearDamping>k__BackingField: 0.5
+    <RotationSmoothness>k__BackingField: 1.5
     <MaxAngularSpeed>k__BackingField: 6.28
   <Diet>k__BackingField:
-    <MinNutrients>k__BackingField: 60
+    <MinNutrients>k__BackingField: 120
     <MaxNutrients>k__BackingField: 300
     <NutrientDecayPerSecond>k__BackingField: 1
     <Synthesizing>k__BackingField:
-      <MinStrength>k__BackingField: 0.5
-      <MaxStrength>k__BackingField: 2
+      <MinStrength>k__BackingField: 1
+      <MaxStrength>k__BackingField: 2.5
     <Biting>k__BackingField:
       <MinStrength>k__BackingField: 10
       <MaxStrength>k__BackingField: 100
       <Cooldown>k__BackingField: 2
-  <Life>k__BackingField:
+      <StaggeringInterval>k__BackingField: 4
+  <Lifetime>k__BackingField:
     <MinLifetime>k__BackingField: 60
     <MaxLifetime>k__BackingField: 300
+  <Reproduction>k__BackingField:
+    MinMutationChance: 0.05
+    MaxMutationChance: 1
+    MinMutationDeviation: 0.05
+    MaxMutationDeviation: 0.5
 --- !u!114 &743023121
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,7 +3,7 @@ using Unity.Entities;
 
 namespace Diet
 {
-    [BurstCompile, UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [BurstCompile, UpdateInGroup(typeof(PresentationSystemGroup), OrderLast = true)]
     public partial struct DisableDietEventsSystem : ISystem
     {
         [BurstCompile]

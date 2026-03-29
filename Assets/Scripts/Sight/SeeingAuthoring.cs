@@ -31,7 +31,7 @@ namespace Sight
 
     public struct SeenEvent : IComponentData, IEnableableComponent
     {
-        // 7 элементов, 8 битов на каждый float2 + 4 бита на header
+        // 7 элементов, 8 байт на каждый float2 + 4 байта на header
         public FixedList64Bytes<float2> ToTargets;
     }
 }
